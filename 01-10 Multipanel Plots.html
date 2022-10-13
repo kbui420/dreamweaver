@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head>
+	<title></title>
+	<meta charset="UTF-8">
+	<script type="text/javascript"> document.write('<'+'!--'); </script>
+       <link rel="stylesheet" type="text/css" href="/content/DEVELOPMENT/2018/courses/DEV-belinsky-2018-BackendTest/Programming/Release/editor.css">
+    <!-- -->
+	<script>
+const D2LMathML="";
+		var scriptFile = document.createElement('script');
+		scriptFile.src = "https://cdn.jsdelivr.net/gh/QFCatMSU/OnlineClassBackEnd/module.js";
+		document.getElementsByTagName('head')[0].appendChild(scriptFile);
+	</script>
+</head>
+
+<body>
+<p class="previousLesson">Text Plots</p>
+<p class="nextLesson"></p>
+<h1 class="title" id="title">01-10: Multipanel Plots</h1>
+<h2>Purpose</h2>
+<ul>
+<li>Using grep to find values that meet multiple conditions</li>
+<li>Arrange multiple plots on a canvas</li>
+<li>Customizing plots on a canvas</li>
+</ul>
+<h2>Future changes</h2>
+<ul>
+<li>Add info about how the RStudio plot window does not always generate the plots -- need to refresh or click the Zoom button.</li>
+</ul>
+<h2>Get data</h2>
+<p>In this lesson we are going to put multiple plots on one canvas.&nbsp; To do this we must first install an R package called <em><strong>gridExtra</strong></em>&nbsp;</p>
+<p class="fs">For this lesson, we will work from the data file, <a href="https://cdn.jsdelivr.net/gh/QFCatMSU/GGPlot-Class-Material/data/LansingNOAA2016-3.csv" target="_self" class="download">LansingNOAA2016-3.csv</a>.<br>
+</p>
+<h6>source( file="scripts/reference.R" ); <br>
+weatherData = read.csv( file="data/LansingNOAA2016-3.csv", <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stringsAsFactors = FALSE );</h6>
+<h3>Add library for multiple plots</h3>
+<p></p>
+<p>To install <em><strong>gridExtra</strong> </em>in RStudio:</p>
+<ul>
+<li>go to <em><strong>Tools</strong> </em>-&gt; <em><strong>Install Packages</strong></em></li>
+<li>in the Packages textbox type in <em><strong>gridExtra</strong> </em>then</li>
+<li>click <em><strong>Install</strong></em></li>
+</ul>
+<p></p>
+<p>You will also need to add the <em><strong>gridExtra</strong> </em>library to your script, you can do that in <em><strong>reference</strong><strong>.r</strong></em> by adding to the top:</p>
+<h6 class="nn">library(package=gridExtra);</h6>
+<h2>Conditional comparisons of vector values</h2>
+<p>If this lesson, we are going to working with the <em><strong>weatherType</strong> </em>column in <em><strong>weatherData</strong></em>.&nbsp; <em><strong>weatherType</strong> </em>consists of codes that indicate the type of weather events that occurred during the day.&nbsp; For instance <strong>RA</strong> means rain, <strong>BR</strong> means breezy, <strong>HZ</strong> means hazy. The weather events are separated by commas within the cell.<em><strong></strong></em></p>
+<p></p>
+<p><img src="../Images/GGP-01-10-WeatherType.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5><strong>weatherType</strong> column in <strong>weatherData</strong></h5>
+<p></p>
+<p>The problem with the way <em><strong>weatherType</strong> </em>is presented is that it makes it hard to find days with one specific weather condition (like rain, <em><strong>RA</strong></em>).&nbsp; The following code will only give you the index values of days that were exclusively rainy (i.e., no other weather event except for <strong>RA</strong>):</p>
+<h6 class="nn">which(weatherData$weatherType == "RA") # find rainy days</h6>
+<p></p>
+<p>A common way to deal with this situation is to break the column up into multiple columns, each representing one weather condition (<strong>RA</strong>, <strong>HZ</strong>, <strong>BR</strong>, etc...).&nbsp; A more robust way is to use<em><strong> grep()</strong></em> to find the codes within the column.</p>
+<h3>grep() to find weather event</h3>
+<p>We can use <em><strong>grep() </strong></em>to find patterns within a column.&nbsp; In this case, patterns that match the characters <strong>RA</strong> and <strong>BR</strong> (rainy and breezy):</p>
+<p class="code">#### Part 1: using grep to find days with a specific weather event</p>
+<h6 class="p">rainyDays = grep(weatherData$weatherType, pattern="RA");&nbsp;&nbsp; # any day with rain<br>breezyDays = grep(weatherData$weatherType, pattern="BR");&nbsp; # any breezy day</h6>
+<p></p>
+<p><em><strong>rainyDays</strong> </em>has <strong>124</strong> values, meaning there were <strong>124</strong> days with some rain (the code <strong>RA</strong>)</p>
+<p><em><strong>breezyDays</strong> </em>has <strong>172</strong> values, meaning there were <strong>172</strong> days with strong winds (the code <strong>BR</strong>)</p>
+<p></p>
+<p><img src="../Images/GGP-01-10-GrepEvents.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Finding the index values of the days with rain and those that were breezy</h5>
+<h3>Plotting a subset of values</h3>
+<p>We will now plot humidity vs temperature for only the <strong>172</strong> days the were breezy using <em><strong>breezyDays</strong> </em>to subset of <em><strong>weatherData</strong></em>:</p>
+<h6 class="p">#### Part 2: Scatterplot for Humidity vs. Temperature on breezy days<br>plot1 = ggplot(<em class="hl">data=weatherData[breezyDays,]</em>) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point(mapping=aes(x=avgTemp, y=relHum)) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_classic() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Humidity vs. Temperature (Breezy Days)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Degrees (Fahrenheit)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Relative Humidity");<br>plot(plot1);</h6>
+<p></p>
+<p>We have a plot with 172 points, matching the 172 days it was breezy (or, the 172 index values in <em><strong>breezyDays</strong></em>).</p>
+<p></p>
+<p><img src="../Images/GGP-01-10-PlotSubset.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="breezyDays">Scatterplot of humidity vs. temperature on breezy days</h5>
+<h2>Combining conditions</h2>
+<p>Next we want to find index values for various combinations of weather events for example:</p>
+<ul>
+<li>days with two events (e.g., rainy <strong>and</strong> breezy)</li>
+<li>days with at least one of two events (e.g., rainy <strong>or</strong> breezy)</li>
+<li>days with exclusively one event (e.g., rainy <strong>and not</strong> breezy)</li>
+</ul>
+<p></p>
+<p>R has three functions, called<em class="hl"> set operations</em>, that can perform the above tasks:</p>
+<ul>
+<li><em><strong>intersect()</strong></em> -- the vector equivalent of an <strong>AND</strong> statement (rainy <em><strong>&amp;&amp; </strong></em>breezy)</li>
+<li><em><strong>union()</strong></em> -- the vector equivalent of an <strong>OR</strong> statement (rainy <em><strong>|| </strong></em>breezy)</li>
+<li><em><strong>setdiff()</strong></em> -- the vector equivalent of an <strong>AND NOT</strong> statement (rainy <em><strong>&amp;&amp; !</strong></em>breezy)</li>
+</ul>
+<p></p>
+<p>The following code creates a vector that contains the index values for days that were <em class="hl">both rainy and windy</em>:</p>
+<h6 class="nn">rainyAndBreezy = intersect(rainyDays, breezyDays);</h6>
+<p></p>
+<p>Let's code for the four possible combinations of windy and rainy conditions:&nbsp;</p>
+<h6 class="p">#### Part 3: Combine event using set operations<br>rainyAndBreezy = intersect(rainyDays, breezyDays); # days with rain AND wind<br>rainyOrBreezy = union(rainyDays, breezyDays);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # days with rain OR wind<br>rainyNotBreezy = setdiff(rainyDays, breezyDays);&nbsp;&nbsp; # days with rain but NOT wind<br>breezyNotRainy = setdiff(breezyDays, rainyDays);&nbsp;&nbsp; # days with wind but NOT rain</h6>
+<p></p>
+<p>We can see that there were <strong>82</strong> days that were breezy but not rainy represented by the <strong>82</strong> index values in <em><strong>breezyNotRainy</strong></em>.&nbsp; There were <strong>34</strong> days that were rainy but not breezy, represented by the <strong>34</strong> index values in <em><strong>rainyNotBreezy</strong> </em>-- the first of those days being the 69<sup>th</sup> day of the year, which is in early April.</p>
+<p></p>
+<p><img src="../Images/GGP-01-10-CombinedEvents.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Vectors that contain the indexes for combined weather events</h5>
+<p></p>
+<p class="ref" id="r-neither">Extension: Code for days that were neither rainy nor windy</p>
+<h2>Set up for multiple plots</h2>
+<p>We now have six combinations of the weather events <strong>rainy</strong> and <strong>breezy</strong> to plot:</p>
+<ol>
+<li>breezy days (plotted in<em class="ref" id="r-breezyDays"> Fig ##</em>)</li>
+<li>rainy days</li>
+<li>rainy AND breezy days</li>
+<li>rainy OR breezy days</li>
+<li>rainy AND NOT breezy days</li>
+<li>breezy AND NOT rainy days</li>
+</ol>
+<h3>&nbsp;Create plot data</h3>
+<p class="code">We have already created the plot data for breeezy days (#1).&nbsp; We are now going to create the plot data for combinations #2 through #6.&nbsp; <em class="note">Note: we are not printing the plots out yet -- we are just creating the data for the plots.</em></p>
+<p></p>
+<h6 class="p">#### Part 4: Creating plots for all rainy day/breezy day combinations</h6>
+<h6 class="p">plot2 = ggplot(data=weatherData<em class="hl">[rainyDays,]</em>) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point(mapping=aes(x=avgTemp, y=relHum)) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_classic() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Humidity vs. Temperature (rainy days)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Degrees (Fahrenheit)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Relative Humidity");</h6>
+<h6 class="p"><br>plot3 = ggplot(data=weatherData<em class="hl">[rainyAndBreezy,]</em>) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point(mapping=aes(x=avgTemp, y=relHum)) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_classic() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Hum vs. Temp (Rainy AND Breezy)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Degrees (Fahrenheit)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Relative Humidity");</h6>
+<h6 class="p"></h6>
+<h6 class="p">plot4 = ggplot(data=weatherData<em class="hl">[rainyOrBreezy,]</em>) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point(mapping=aes(x=avgTemp, y=relHum)) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_classic() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Hum vs. Temp (Rainy or Breezy)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Degrees (Fahrenheit)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Relative Humidity");</h6>
+<h6></h6>
+<h6 class="p">plot5 = ggplot(data=weatherData<em class="hl">[rainyNotBreezy,]</em>) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point(mapping=aes(x=avgTemp, y=relHum)) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_classic() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Hum vs. Temp (Rainy and NOT Breezy)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Degrees (Fahrenheit)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Relative Humidity");</h6>
+<h6></h6>
+<h6 class="p">plot6 = ggplot(data=weatherData<em class="hl">[breezyNotRainy,]</em>) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point(mapping=aes(x=avgTemp, y=relHum)) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_classic() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Hum vs. Temp (Breezy and NOT Rainy)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Degrees (Fahrenheit)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Relative Humidity");</h6>
+<p></p>
+<p><img src="../Images/GGP-01-10-MultiplePlots.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="sixplots">Creating the plot data for each event combination</h5>
+<h2>Multiple plots on one canvas</h2>
+<p>We have not created any plots yet, we have created the data for six different plots.&nbsp; Up until now, we have used <em><strong>plot()</strong> </em>to put one plot on a canvas or we added <strong>facets</strong> to place multiple plots on one axis. Now, we are going to use <em><strong>grid.arrange()</strong></em> in the <em><strong>gridExtra</strong> </em>library to <em class="hl">create a canvas with multiple plots</em>.&nbsp;</p>
+<p></p>
+<p>There is&nbsp;<a href="https://www.rdocumentation.org/packages/gridExtra/versions/2.3/topics/arrangeGrob" target="_blank" rel="noopener">documentation for <em><strong>grid.arrange()</strong></em></a> but it is not very intuitive -- however, you should know that <em><strong>grob</strong> </em>stands for <em><strong>gr</strong></em>aphical <em><strong>ob</strong></em>jects, and plots are considered graphical objects.</p>
+<p></p>
+<p>We are going to arrange the six plots created above (<em class="ref" id="r-sixplots">Fig ##</em>) on a canvas using three different methods:</p>
+<ul>
+<li>by rows</li>
+<li>by columns</li>
+<li>customized using a matrix</li>
+</ul>
+<h3>Plots in rows</h3>
+<p>The plots that will be added to the canvas must go first in <em><strong>grid.arrange()</strong></em>.&nbsp; You can put as many plots in as you want separated by commas.&nbsp; After you put in all the plot names, you need to set parameters for the canvas.&nbsp;</p>
+<p></p>
+<p>For this canvas, we set the number of rows parameter, or <em><strong>nrow&nbsp;</strong> </em>to <strong>3</strong>.&nbsp; This means <em><strong>grid.arrange()</strong></em> will place the plots listed into 3 rows (using as many columns as necessary).&nbsp; Since there are six plots, each of the 3 rows will have 2 plots.</p>
+<p></p>
+<h6 class="p">#### Part 5: Arranging plots on one canvas by rows <br>grid.arrange(plot1, plot2, plot3, plot4, plot5, plot6, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; nrow=3);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-10-PlotByRows.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<p class="fig">Arranging plots by rows in a canvas</p>
+<h3>Plots in columns</h3>
+<p>Arranging plots by column works almost the same way as arranging by rows except we use the parameter <em><strong>ncol.&nbsp;&nbsp;</strong></em></p>
+<p></p>
+<p>For this canvas we are going to put the plots in the reverse order and skip the last plot (<em><strong>plot1</strong></em>) -- so there are only five plots.&nbsp; Since we set <em><strong>ncol</strong> </em>to <strong>3</strong> and there are <strong>5</strong> plots, <em><strong>grid.arrange()</strong> </em>creates two rows but leaves an empty space at the end of the last row.</p>
+<h6 class="p">#### Part 6: Arranging plots on canvas by columns<br>grid.arrange(plot6, plot5, plot4, plot3, plot2,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ncol=3);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-10-PlotByCols.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<p class="fig">Arranging plots by columns in a canvas</p>
+<h3>Customized canvas</h3>
+<p>The parameter in <em><strong>grid.arrange()</strong></em> that is probably most used is <em><strong>layout_matrix</strong></em>. <em><strong>layout_matrix</strong></em> allows more flexibility in the plot layout.</p>
+<p></p>
+<p><em><strong>layout_matrix</strong></em> is set to a matrix with numbers representing the plots.&nbsp; The rows and columns of the matrix (with their corresponding plot numbers) match the canvas layout of the plots.</p>
+<p></p>
+<p></p>
+<p>In the following example:</p>
+<ul>
+<li><strong></strong>All 6 plots are used</li>
+<li>The first row on the canvas will have the 4<sup>th</sup>, 5<sup>th</sup>, and 6<sup>th</sup> plots (<em><strong>plot4</strong></em>, <em><strong>plot5</strong></em>, and <em><strong>plot6</strong></em>)</li>
+<li>The second row on the canvas will have the 3<sup>rd</sup>, 2<sup>nd</sup>, and 1<sup>st</sup> plots (<em><strong>plot3</strong></em>, <em><strong>plot2</strong></em>, and <em><strong>plot1</strong></em>)</li>
+</ul>
+<h6 class="p">#### Part 7: Customize arrangements using matrix<br>grid.arrange(plot1, plot2, plot3, plot4, plot5, plot6,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; layout_matrix = rbind(c(4,5,6),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c(3,2,1)));</h6>
+<p></p>
+<p class="note">Note: The numbers in the matrix represent the order the plots are listed.</p>
+<p></p>
+<p><img src="../Images/GGP-01-10%20MatrixLayout.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>The 6 plots using the matrix layout</h5>
+<h3>Empty spaces within the canvas</h3>
+<p>We can use <em><strong>NA</strong> </em>to represent an empty space (i.e., no plot).</p>
+<p></p>
+<p>The code:</p>
+<h6 class="nn">layout_matrix = rbind(c(NA,1,2),&nbsp;&nbsp;&nbsp;&nbsp; # row 1: nothing, 1st plot, 2nd plot<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c(3,NA,NA)));&nbsp; # row 2: 3rd plot, nothing, nothing</h6>
+<p>Tells<em><strong> grid.arrange()</strong></em> to create a canvas that has 2 rows and 3 columns.&nbsp;</p>
+<ul>
+<li>Row 1 has nothing in the first column, the 1<sup>st</sup> plot in the second column, and the 2<sup>nd</sup> plot in the third column</li>
+<li>Row 2 has the 3<sup>rd</sup> plot in the first column and nothing in the second or third column</li>
+</ul>
+<p></p>
+<p>In the following code, <em class="hl"><strong>plot3</strong> is the 1<sup>st</sup> plot</em>, <em><strong>plot4</strong> </em>is the 2<sup>nd</sup> plot, and <em><strong>plot5</strong> </em>is the 3<sup>rd</sup> plot:</p>
+<h6 class="p">#### Part 8: Add empty spaces to customized arrangement<br>grid.arrange(plot3, plot4, plot5,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; layout_matrix = rbind(c(NA,1,2),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c(3,NA,NA)));</h6>
+<p></p>
+<p><img src="../Images/GGP-01-10-Matrix.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Using<strong> layout_matrix</strong> to customize the canvas</h5>
+<h3>Sizing plots</h3>
+<p>We can also use <em><strong>layout_matrix</strong></em> to resize plots by extending them across rows and columns.</p>
+<p></p>
+<p>The following code makes the:</p>
+<ul>
+<li>1st plot 2 columns by 2 rows,</li>
+<li>2nd plot 1 column by 1 row</li>
+<li>3rd plot 2 columns by 1 row</li>
+<li>4th plot 1 column by 2 rows</li>
+</ul>
+<h6 class="nn">layout_matrix = rbind(c(1,1,2),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c(1,1,NA),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c(4,3,3),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c(4,NA,NA)));</h6>
+<p></p>
+<p>Let's put the <strong>4x3</strong> matrix in <em><strong>grid.arrange()</strong></em>:</p>
+<p></p>
+<h6 class="p">#### Part 9: Extending plots across rows and columns<br>grid.arrange(plot1, plot2, plot3, plot4, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; layout_matrix = rbind(c(1,1,2),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; c(1,1,NA),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c(4,3,3),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; c(4,NA,NA)));</h6>
+<p></p>
+<p><img src="../Images/GGP-01-10-SizingPlots.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Extending plots across rows and down columns</h5>
+<p></p>
+<h2>Errors in layout_matrix</h2>
+<p><em class="hl"><strong>grid.arrange()</strong> is very sensitive </em>and often produces unintuitive errors.&nbsp; In this section, we will look at some of the issues and the errors associated with the issues.</p>
+<h3>Issue 1: Plots listed must be used in matrix</h3>
+<p>All plots listed in<em><strong> grid.arrange()</strong></em> must be used in the matrix</p>
+<p></p>
+<p>Issue: <em><strong>plot2</strong> </em>is listed but not used in the matrix:</p>
+<h6 class="p">#### Issue 1: Plots listed must be used in matrix</h6>
+<h6 class="p">####&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Plot 2 is not used in the layout_matrix<br>grid.arrange(plot1, <em class="hl">plot2</em>, plot3, plot4, plot5<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; layout_matrix = rbind(c(1,1,5),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; c(1,1,NA),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c(4,3,3),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; c(4,NA,NA)));</h6>
+<p></p>
+<p>Executing this grid without using Plot 2 produces the error:</p>
+<p><em class="hl">Error in t:b : NA/NaN argument</em></p>
+<p><em class="hl"></em></p>
+<p><img src="../Images/GGP-01-10-Issue1-UnusedPlot.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Plot put into <strong>grid.arrange()</strong> but not used in <strong>layout_matrix()</strong></h5>
+<h3>Invalid index numbers in matrix</h3>
+<p>Issue: index <strong>5</strong> is used in the matrix but there is no 5<sup>th</sup> plot</p>
+<h6 class="p">#### Issue 2: Invalid index error (there is no 5th plot)<br>grid.arrange(plot1, plot2, plot3, plot4<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; layout_matrix = rbind(c(1,1,<em class="hl">5</em>),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; c(1,1,NA),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c(4,3,3),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; c(4,NA,NA)));</h6>
+<p></p>
+< class="code">When executing this grid, the number will be ignored by <em><strong>layout_matrix() </strong></em>and nothing will be plotted in that area.</>
+<p></p>
+<p><img src="../Images/GGP-01-10-Issue2-InvalidIndex.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Nothing is plotted in the area of the grid with an invalid plot index (5).</h5>
+<h3>Extending plots to fill a rectangle</h3>
+<p><em><strong>grid.arrange()</strong></em> makes two important assumptions:</p>
+<ol>
+<li>All plots take up a rectangular space on the grid</li>
+<li>All plots are represented only once on the canvas</li>
+</ol>
+<p></p>
+<p>If you arrange the index numbers in the matrix in a non-rectangular fashion, <em><strong>grid.arrange()</strong></em> will "fill" in the rest of the rectangle.</p>
+<p></p>
+<p>In the following code, <em><strong>grid.arrange()</strong></em> will extend <em><strong>plot1</strong> </em>across the 2 rows and 2 columns</p>
+<h6 class="p">#### Issue 3: The grid will extend discontinuous plots to fill a rectangle</h6>
+<h6 class="p">#### &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; plot1 will be extended to a rectangle that is 2x2<br>grid.arrange(plot1, plot2,<br>layout_matrix = rbind(c(1,NA,2),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c(NA,1,NA)));</h6>
+<p></p>
+<p><img src="../Images/GGP-01-10-Issue3-ExtendPlots.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Plots are extended to fill the rectangular area they represent in the grid.</h5>
+<h3>Overlapping plots</h3>
+<p>In this example, <em><strong>grid.arrange()</strong> </em>assumes that <em><strong>plot1</strong> </em>is <strong>2</strong> rows x <strong>3</strong> columns (it takes up the whole plot area).&nbsp; This means that plot1 and plot2 both use the spot on the 1st row, 3rd column.</p>
+<p></p>
+<p>In this case, <em><strong>plot2</strong> </em>overlaps <em><strong>plot1 </strong></em>in the one grid space because <em><strong>plot2</strong> </em>comes after <em><strong>plot1</strong> </em>in <em><strong>grid.arrange()</strong></em>.</p>
+<h6 class="p">#### Issue 4: Overlapping plots -- priority goes to the later plot</h6>
+<h6 class="p">####&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; In this case, plot2 overlaps plot1<br>grid.arrange(plot1, plot2,<br>layout_matrix = rbind(c(1,NA,2),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c(NA,NA,1)));</h6>
+<p></p>
+<p><img src="../Images/GGP-01-10-Issue4-OverlappingPlots.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Plots overlapping in <strong>layout_matrix()</strong>, the later plot get priority.</h5>
+<h3>Hidden plots due to overlapping</h3>
+<p><em><strong>grid.arrange()</strong></em> puts plots with higher indexes on top.&nbsp; So, if we reverse the previous canvas and stretch <em><strong>plot2</strong> </em>across the whole canvas then <em><strong>plot2</strong> </em>will still overlap <em><strong>plot1.</strong></em>&nbsp; This effectively hides <em><strong>plot1</strong></em>.</p>
+<p></p>
+<h6 class="p">#### Issue 5: Hidden plots due to overlapping</h6>
+<h6 class="p">####&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; In this case, plot2 completely covers up plot1</h6>
+<h6 class="p">grid.arrange(plot1, plot2,<br>layout_matrix = rbind(c(2,NA,1),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c(NA,NA,2)));</h6>
+<p></p>
+<p><img src="../Images/GGP-01-10-Issue5-HiddenPlots.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>A plot is hidden because it is overlapped by another plot with higher priority.</h5>
+<h3>Time elapsed warning</h3>
+<p>When the canvas area is complicated, the plot will sometimes not be fully drawn.&nbsp; This is an inconsistent error that happens in RStudio on slower computers.&nbsp;</p>
+<p></p>
+<p>Theoretically, this should show <em><strong>plot4</strong> </em>across the whole canvas, covering up the other plots.&nbsp;</p>
+<h6 class="p">#### Part 10: Error in plot placement<br>grid.arrange(plot1, plot2, plot3, plot4, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; layout_matrix = rbind(c(1,1,<em class="hl">4</em>),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; c(1,2,NA),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c(4,3,3),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; c(<em class="hl">4</em>,NA,NA)));</h6>
+<p></p>
+<p>This code will sometimes give an elapsed time warning like:</p>
+<p class="hl">In unique.default(lengths(x)) : reached elapsed time limit</p>
+<p class="hl"></p>
+<p>If the full canvas does not get drawn when you execute the script, you can press the <em><strong>Zoom</strong> </em>button to open the canvas in a new window.</p>
+<p></p>
+<p><img src="../Images/GGP-01-10-Issue6-ZoomButton.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Using the Zoom button to open a plot in a new window.</h5>
+<h2>Application</h2>
+<p>Find how different weather conditions in the <em><strong>weatherType</strong> </em>column correlate with <em><strong>tempDept</strong></em>. <em class="note">Note: <strong>tempDept</strong> is how far the temperature for the day was from the historic average temperature for that day.</em></p>
+<p><em class="note"></em></p>
+<ol>
+<li>Create a script file in your GGPlot Class Project called <em><strong>app10.r</strong></em>.</li>
+<li>Create a histogram of <em><strong>tempDept</strong> </em>restricted to days that meet a condition in the <em><strong>weatherType</strong> </em>column:<br>
+<ul>
+<li>To restrict the data, you can subset with the indices that meet the condition (e.g., <em><strong>data=weatherData[daysWithRain,]</strong></em>)</li>
+<li>Place a vertical line at the average <em><strong>tempDept</strong> </em>for the condition and label the line with the average value</li>
+</ul>
+</li>
+<li>Repeat step 2 for two more conditions in the <em><strong>weatherType</strong> </em>column (so, three histograms in all)</li>
+<li>Create a histogram of <em><strong>tempDept</strong> </em>restricted to days where <em class="hl">two conditions occur</em> in the <em><strong>weatherType</strong> </em>column (e.g., rainy AND breezy).
+<ul>
+<li>Place a vertical line at the average <em><strong>tempDept</strong> </em>and label the line with the average value</li>
+</ul>
+</li>
+<li>Create a histogram of <em><strong>tempDept</strong> </em>restricted to days where <em class="hl">one of two conditions occur</em> in the <em><strong>weatherType</strong> </em>column (e.g., rainy OR breezy).
+<ul>
+<li>Place a vertical line at the average <em><strong>tempDept</strong> </em>and label the line with the average value<em><strong></strong></em></li>
+</ul>
+</li>
+<li>Using <em><strong>grid.arrange()</strong></em>, place the 5 histograms you created in the previous steps on one canvas</li>
+<li>Using <em><strong>grid.arrange()</strong></em>, pick three histograms from steps 2-4 and place them on a canvas
+<ul>
+<li>Resize at least 2 of the histogram so they take up more than 1 cell</li>
+</ul>
+</li>
+</ol>
+<h3>Questions</h3>
+<ol>
+<li>What was your level of comfort with the lesson/application?</li>
+<li>What areas of the lesson/application confused or still confuses you?</li>
+<li>What are some things you would like to learn related to, but not covered in, this lesson?</li>
+</ol>
+<h2 class="extension" id="neither">Extension: Coding for neither condition</h2>
+<h6 class="nn">notRainyAndNotBreezy = setdiff(1:366, rainyOrBreezy);</h6>
+<p></p>
+</body></html>

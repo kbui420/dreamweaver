@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head>
+	<title></title>
+	<meta charset="UTF-8">
+	 <script type="text/javascript"> document.write('<'+'!--'); </script>
+       <link rel="stylesheet" type="text/css" href="/content/DEVELOPMENT/2018/courses/DEV-belinsky-2018-BackendTest/Programming/Release/editor.css">
+    <!-- -->
+	<script>
+const D2LMathML="";
+		var scriptFile = document.createElement('script');
+		scriptFile.src = "https://cdn.jsdelivr.net/gh/QFCatMSU/OnlineClassBackEnd/module.js";
+		document.getElementsByTagName('head')[0].appendChild(scriptFile);
+	</script>
+</head>
+
+<body>
+<p class="previousLesson">Date objects and plot area styles</p>
+<p class="nextLesson">Boxplots 1</p>
+<h1 class="title" id="title">01-05: Histograms</h1>
+<h2>Purpose</h2>
+<ul>
+<li>Creating histograms and stacked histograms</li>
+<li>place multiple histograms on one plot</li>
+<li>Add lines to a plot</li>
+<li>Creating new data columns using <em><strong>which()</strong></em></li>
+</ul>
+<h2>Get data</h2>
+<p class="fs">Like last lesson, we are going to:</p>
+<ul>
+<li>get weather data from the file <a href="https://cdn.jsdelivr.net/gh/QFCatMSU/GGPlot-Class-Material/data/LansingNOAA2016.csv" target="_self" class="download">LansingNOAA2016.csv</a></li>
+<li>save it to a data frame called <em><strong>weatherData</strong> </em></li>
+<li>reformat the date to add the year (<em class="ref" id="r-dataframe">fig ##</em>)
+<ul>
+<li>Note how R displays the dates in the default format (<em><strong>%Y-%m-%d</strong></em>), not the format used in the script (<em><strong>%m-%d-%Y</strong></em>)</li>
+</ul>
+</li>
+</ul>
+<p></p>
+<h6>source( file="scripts/reference.R" ); <br>weatherData = read.csv( file="data/LansingNOAA2016.csv", <br>stringsAsFactors = FALSE );<br><br>#### Part 1: Add year to date vector and save back to data frame<br>theDate = weatherData$date;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # save date column to vector<br>theDate = paste(theDate, "-2016", sep="");&nbsp;&nbsp;&nbsp;&nbsp; # append -2016 to vector<br>theDate = as.Date(theDate, format="%m-%d-%Y"); # format vector as Date</h6>
+<h6>weatherData$dateYr = theDate;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # save vector to Data Frame&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h6>
+<p></p>
+<p><img src="../Images/GGP-01-05-DateInDataFrame.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="dataframe">A couple of different ways to see the new <strong>dateYr</strong> column in <strong>weatherData</strong></h5>
+<h3>Saving the new data frame</h3>
+<p>We do not need to repeat the <em><strong>date</strong> </em>conversion each time we read the data from the CSV file.&nbsp; Instead, using <em><strong>write.csv()</strong></em>, we can save the <em><strong>weatherData</strong> </em>data frame with the reformatted year to a new CSV file<em><strong></strong></em>.&nbsp; In this case, we will save the data frame to the file <em><strong>LansingNOAA2016-2.csv</strong></em> in the <em><strong>data</strong> </em>directory.&nbsp;</p>
+<p></p>
+<p><em class="hl">We are going to put this command at the end of the script</em> because we will also be using the <em><strong>season</strong> </em>column, created later in this lesson, in future lessons.</p>
+<p></p>
+<h6 class="nn">#### End of Code: Save the modified data frame to a new CSV file<br>write.csv(weatherData, file="data/LansingNOAA2016-2.csv");</h6>
+<p></p>
+<p><img src="../Images/GGP-01-05-SaveNewDF.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>The new CSV file, <strong>LansingNOAA2016-2.csv</strong> was save to the <em><strong>data</strong> </em>folder</h5>
+<h3>Using the new data frame</h3>
+<p>In the application for this lesson, we will read from the new CSV file by replacing line 3:</p>
+<h6 class="p" title="3">weatherData = read.csv(file="data/<em class="hl">LansingNOAA2016.csv</em>", <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stringsAsFactors = FALSE);</h6>
+<p></p>
+<p>with:</p>
+<h6 class="p" title="3">weatherData = read.csv(file="data/<em class="hl">LansingNOAA2016-2.csv</em>", <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stringsAsFactors = FALSE);</h6>
+<h2>Creating a new data column: season</h2>
+<p>In this lesson, we will look at histograms that show seasonal temperatures.&nbsp; To do this we need to create a vector with 366 values that maps each day of the year (<em><strong>dateYr</strong> </em>column) to a season.&nbsp; So, every value in this vector will be one of the four seasons.</p>
+<h3>Create the season vector</h3>
+<p>We will start by create a vector that holds all the season values.&nbsp; We will use <em><strong>vector()</strong></em> to explicitly create a vector that contain character values (<em><strong>mode</strong></em>="character") and has the same length as <em><strong>theDate</strong> </em>vector.&nbsp; This create a vector with <strong>366</strong> empty string values: "" (<em class="ref" id="r-initSeason">fig ##</em>).&nbsp;</p>
+<p></p>
+<h6>#### Part 2: Set up the season and date variables<br># create a season vector that has the same length as theDate vector<br>season = vector(mode="character", length=length(theDate));</h6>
+<p></p>
+<p>To help us with the conditional statements used to find the season, we will create variables that hold the start date for each season.&nbsp; We need to be explicit that the variable is a date, using <em><strong>as.Date()</strong></em>,&nbsp; and the <em><strong>format</strong> </em>the date is in.</p>
+<h6># create date variables for the beginning of each season<br>springStart = as.Date("03-21-2016", format="%m-%d-%Y");<br>summerStart = as.Date("06-21-2016", format="%m-%d-%Y");<br>fallStart = as.Date("09-21-2016", format="%m-%d-%Y");<br>winterStart = as.Date("12-21-2016", format="%m-%d-%Y");</h6>
+<p></p>
+<p><img src="../Images/GGP-01-05-SeasonVector.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="initSeason">The initial <strong>season</strong> vector along with the variables that hold the season start dates</h5>
+<h3>Using logical operations to find the seasons</h3>
+<p>We need to go through each date value in the <em><strong>theDate</strong> </em>and associate a season in <em><strong>season</strong></em>.</p>
+<p></p>
+<p>To go through each value, we use a <em><strong>for()</strong></em> that goes from <strong>1</strong> to the length, 366, of <em><strong>theDate</strong></em>.</p>
+<h6 class="nn">for(i in 1:length(theDate)) # go through each date</h6>
+<p></p>
+<p>We can use logical operators on dates to see if a date is earlier (less than) or later (greater than) another date. Let's start with spring.&nbsp; Spring dates are later than or equal to 3/21 (<em><strong>springStart</strong></em>) <em><strong>AND </strong></em>earlier than 6/21 (<em><strong>summerStart</strong></em>)</p>
+<p></p>
+<h6 class="nn"># if the date falls with the spring season<br>if(theDate[i] &gt;= springStart &amp;&amp; theDate[i] &lt; summerStart)<br>{<br>&nbsp; season[i] = "Spring";<br>}</h6>
+<p></p>
+<p>Summer and fall dates are found using a similar method.&nbsp;</p>
+<p></p>
+<p>Winter is a little different because the dates are not continuous, they fall at the beginning (Jan1-21) and end (Sept 21-Dec 31) of the year.&nbsp; So we need to use the <em><strong>OR</strong> </em>operator instead.&nbsp; Winter dates are later than or equal to 12/21 (<em><strong>winterStart</strong></em>) <em><strong>OR </strong></em>earlier than 3/21 (<em><strong>springStart</strong></em>)</p>
+<p></p>
+<h6 class="nn">else if(theDate[i] &gt;= winterStart || theDate[i] &lt; springStart)<br>{<br>&nbsp; season[i] = "Winter";<br>}</h6>
+<h3>Populate the season vector</h3>
+<p>Putting all the code together and adding in an error condition.&nbsp; <em class="note">Note: adding error conditions is a good programming practice -- it would catch situations where a value was spelled wrong or missing.</em></p>
+<p><em class="note"></em></p>
+<h6>#### Part 3: Create a season vector based on theDates vector<br>for(i in 1:length(theDate)) # go through each date<br>{<br>&nbsp; # if the date falls with the spring season<br>&nbsp; if(theDate[i] &gt;= springStart &amp;&amp; theDate[i] &lt; summerStart)<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; season[i] = "Spring";<br>&nbsp; }<br>&nbsp; # if the date falls with the summer season<br>&nbsp; else if(theDate[i] &gt;= summerStart &amp;&amp; theDate[i] &lt; fallStart)<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; season[i] = "Summer";<br>&nbsp; }<br>&nbsp; # if the date falls with the fall season<br>&nbsp; else if(theDate[i] &gt;= fallStart &amp;&amp; theDate[i] &lt; winterStart)<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; season[i] = "Fall";<br>&nbsp; }<br>&nbsp; # if the date falls with the winter season --</h6>
+<h6>&nbsp; #&nbsp;&nbsp;&nbsp; using || because dates are not continuous)<br>&nbsp; else if(theDate[i] &gt;= winterStart || theDate[i] &lt; springStart)<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; season[i] = "Winter";<br>&nbsp; }<br>&nbsp; else # something went wrong... always good to check<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; season[i] = "Error";<br>&nbsp; }<br>}</h6>
+<p></p>
+<p><em class="ref" id="r-which"></em>&nbsp;</p>
+<p><img src="../Images/GGP-01-05-SeasonValues.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="seasonValues">Populating the season vector and displaying the values</h5>
+<p></p>
+<p>We could also use <em><strong>which()</strong></em> to populate the season values, for more information go to <em class="ref" id="r-which">Extension: Using which() to find index values</em></p>
+<h3>Adding season to the data frame</h3>
+<p>We are going to be using the season vector in this lesson and in future lessons, so let's add it to the <em><strong>weatherData</strong> </em>data frame.</p>
+<p></p>
+<div>
+<h6># Part 3: create a new column in weatherData called season and set it to</h6>
+<h6 title="">#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the season vector</h6>
+<h6>weatherData$season = season;</h6>
+</div>
+<p></p>
+<p><img src="../Images/GGP-01-05-SeasonDF.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>The season vector in the data frame</h5>
+<h2>Creating a histogram</h2>
+<p>We are going to plot a histogram of average temperatures by <em><strong>season</strong> </em>but first we will plot a histogram of the whole year using <em><strong>geom_histogram()</strong></em>.&nbsp;</p>
+<p></p>
+<p>For the <em><strong>mapping </strong></em>subcomponent we use:</p>
+<ul>
+<li><em><strong>x=avgTemp </strong></em></li>
+<li><em><strong>y=..count..</strong></em></li>
+</ul>
+<p></p>
+<p>The 2 dots before and after <em><strong>count</strong> </em>indicate that<em class="hl"> <strong>count</strong> is an operation, not a variable</em>.&nbsp; In other words, it says that the <em class="hl">y-axis will represent a count of the x-axis values</em>.&nbsp; In <em><strong>geom_histogram()</strong></em>, <em><strong>y=..count..</strong></em> is the default.&nbsp; The other possible operations are: <em><strong>..density..</strong></em>, <em><strong>..ncount..</strong></em>, and<em><strong> ..ndensity..</strong></em>, the latter two are scaled to have a maximum of 1.</p>
+<h6 class="p">#### Part 5: Create a histogram of temperatures for the year</h6>
+<h6 class="p">plotData = ggplot( data=weatherData ) + <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_histogram( mapping=aes(x=avgTemp, y=..count..) );<br>plot(plotData);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-05-HistogramYear.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>A histogram of <strong>avgTemp</strong></h5>
+<h3 class="">Changing bins and coloring</h3>
+<p class="">Next we will modify subcomponents in <em><strong>geom_histogram()</strong> </em>to changes colors and set the number of bins.</p>
+<p class=""></p>
+<p class="">The subcomponents we will set are:</p>
+<ul>
+<li><em><strong>bins</strong></em>: the number of bins (default is 30)</li>
+<li><em><strong>fill</strong></em>: the background color of the bins</li>
+<li><em><strong>color</strong></em>: outline color of the bins</li>
+</ul>
+<h6 class="p">#### Part 6: Parameter changes to the histogram</h6>
+<h6>plotData = ggplot( data=weatherData ) + <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_histogram( mapping=aes(x=avgTemp, y=..count..),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; bins=40,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; color="grey20",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; fill="darkblue");<br>plot(plotData);</h6>
+<p class=""></p>
+<p class=""><img src="../Images/GGP-01-05-BinParameters.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Changing the number of bin and the color of the bins</h5>
+<h3 class="">Add labels and changing the theme</h3>
+<p>Next we will change the plot theme using the <em><strong>theme_classic()</strong></em> component and add titles and axes labels using the <em><strong>labs()</strong></em> component. <a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" target="_blank" rel="noopener">Here is a list of themes</a> you can use in GGPlot -- the default theme is <em><strong>theme_gray()</strong></em>.</p>
+<p></p>
+<h6 class="p">#### Part 7: Change theme, add titles and labels</h6>
+<h6>plotData = ggplot( data=weatherData ) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_histogram( mapping=aes(x=avgTemp, y=..count..),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bins=40,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="grey20",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fill="darkblue") +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_classic() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Temperature Histogram",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Average Temp (Fahrenheit)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Count");<br>plot(plotData);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-05-ThemeAndLabels.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Titles, labels, and a new theme added to the plot</h5>
+<h3>Histogram alternative parameters</h3>
+<p class="">Here are a couple other values to modify a histogram:</p>
+<ul>
+<li><em><strong>binwidth </strong></em>(instead of <em><strong>bins</strong></em>) -- <em><strong>binwidth</strong> </em>defines the size of the bins (in this case, <strong>4</strong> degrees) wheres <em><strong>bins</strong> </em>defines the number of bins</li>
+<li><em><strong>..</strong><strong>density..</strong> (</em>instead of <em><strong>..count..</strong></em>) on the y-axis -- ..<em><strong>density..</strong> </em>integrates the bin areas to 1</li>
+</ul>
+<p></p>
+<h6 class="p">#### Part 8: Using binwidths and density</h6>
+<h6>plotData = ggplot( data=weatherData ) + <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_histogram(mapping=aes(x=avgTemp, <em class="hl">y=..density..</em>),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">binwidth=4</em>,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="grey20",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fill="darkblue") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_classic() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Temperature Histogram",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Average Temp (Fahrenheit)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Density");<br>plot(plotData);</h6>
+<p class=""><em><strong></strong></em></p>
+<p class=""><em><strong><img src="../Images/GGP-01-05-BinwidthAndDensity.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></strong></em></p>
+<h5><em>D</em>ensity values and binwidths in a histogram</h5>
+<h2>Adding lines</h2>
+<p>Next, we will add two vertical lines to the plot representing the mean and median temperatures.&nbsp; The plotting component that adds vertical lines is <em><strong>geom_vline()</strong></em>.</p>
+<p></p>
+<p>The mapping for <em><strong>geom_vline()</strong> </em>requires only one value to create a vertical line: the x-value of the line.&nbsp; In GGPlot, this parameter is called <em><strong>xintercept</strong></em>.</p>
+<p></p>
+<p>We set <strong>xintercept</strong> to the functions <em><strong>mean()</strong></em> and <em><strong>median()</strong></em> to plot the mean and median values of the values in <em><strong>avgTemp</strong></em>, .</p>
+<p></p>
+<h6 class="p">#### Part 9: Add vertical lines representing mean and median</h6>
+<h6>plotData = ggplot( data=weatherData ) + <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_histogram(mapping=aes(x=avgTemp, y=..density..),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; binwidth=4,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="grey20",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fill="darkblue") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">geom_vline</em>(mapping=aes(<em class="hl">xintercept=mean(avgTemp)</em>),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="red",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size=1.2) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">geom_vline</em>(mapping=aes(<em class="hl">xintercept=median(avgTemp)</em>),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="green",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size=1.2) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_classic() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Temperature Histogram",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Average Temp (Fahrenheit)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Density");<br>plot(plotData);</h6>
+<p></p>
+<p><em class="note">Note: I have also set the color and size of the two vertical lines.</em></p>
+<p></p>
+<p><em><strong><img src="../Images/GGP-01-05-verticalLines.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></strong></em></p>
+<h5>Vertical lines added to histogram</h5>
+<h2 class="">Throwing in seasons</h2>
+<p>Now we are going to create histograms that show temperature by season.&nbsp; There are two ways to do this:</p>
+<ol>
+<li>Create a histogram for each season (faceting)</li>
+<li>Create a stacked histogram</li>
+</ol>
+<h3>Faceting -- one plot for each season</h3>
+<p>We can instruct GGPlot to create a histogram for each season by using the component<em><strong> facet_grid().&nbsp;</strong></em></p>
+<h6 class="nn">&nbsp; facet_grid( facet= season ~ .)</h6>
+<p></p>
+<p>The subcomponent <em><strong>facet</strong> </em>gives the grouping instructions in the form of <strong>( y-axis variable ~ x-axis variable )</strong>.&nbsp; In this example we are using the variable <em><strong>season</strong> </em>to group the data and we are putting <em><strong>season</strong> </em>on the y-axis.&nbsp; The ( . ) in place of the x-axis variable means that there is no grouping along the x-axis.</p>
+<p></p>
+<h6 class="p">#### Part 10: Create a histogram for each season (faceting)</h6>
+<h6>plotData = ggplot(data=weatherData) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_histogram(mapping=aes(x=avgTemp, y=..count..),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bins=40,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="grey20",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fill="darkblue") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_classic() +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">facet_grid( facet= season ~ .)</em> +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Temperature Histogram",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Average Temp (Fahrenheit)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Count");<br>plot(plotData);</h6>
+<p></p>
+<p class="note">Note: seasons are put in alphabetical order -- we will deal with reordering value in the next lesson.&nbsp;</p>
+<p></p>
+<p><img src="../Images/GGP-01-05-Faceting.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Displaying a histogram for each season</h5>
+<p></p>
+<p>If you want to group by <em><strong>season</strong> </em><em class="hl">along the x-axis</em> you would use:</p>
+<h6 class="nn">facet_grid( facet= . ~ season)</h6>
+<h3>Stacked the seasons on a histogram</h3>
+<p>Another option is to create a stacked histogram that shows the count for each <em><strong>season</strong> </em>on one histogram.&nbsp;</p>
+<p></p>
+<p>To do this we make two changes to make to the <em><strong>geom_histogram()</strong> </em>component:</p>
+<ol>
+<li>Set <em><strong>position</strong> </em>to <strong>stack</strong></li>
+<li>Add a <em><strong>fill</strong> </em>parameter to <em><strong>mapping</strong> </em>and set it to <strong>season</strong>.&nbsp;</li>
+</ol>
+<p></p>
+<h6 class="nn">geom_histogram(mapping=aes(x=avgTemp, y=..count.., fill = season),<br>&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bins=40,</h6>
+<h6 class="nn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; position="stack",</h6>
+<h6 class="nn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="grey20")</h6>
+<p></p>
+<p>The second change, <em><strong>fill</strong></em>, needs to be unpacked.&nbsp; <em><strong>fill = season</strong></em> means that we are filling the histogram by the categories in the <em><strong>season</strong> </em>variable (i.e., spring, summer, fall, winter).&nbsp; GGPlot will visually separate the seasons by adding color for each season.</p>
+<p></p>
+<p class="note">Note: fill goes in mapping because fill is mapping the fill data (seasons) to the plot (bars)</p>
+<p class="note"></p>
+<h6 class="p">#### Part 11: Create a stacked histogram for each season</h6>
+<h6 class="p">plotData = ggplot(data=weatherData) + <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_histogram(mapping=aes(x=avgTemp, y=..count.., <em class="hl">fill=season</em>),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bins=40,</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="grey20",</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">position="stack"</em>) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_classic() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Temperature Histogram",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Average Temp (Fahrenheit)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Count");<br>plot(plotData);</h6>
+<p></p>
+<p>In future lessons, we will go over how to manipulate the legend.&nbsp; For quick changes to the legend go to<em class="ref" id="r-legend"> Extension: Quick Legend Changes</em>.</p>
+<p></p>
+<p><img src="../Images/GGP-01-05-StackedHistogram.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>A histogram with stacked seasonal count</h5>
+<h2>Application</h2>
+<ol>
+<li>Create a script file in your <em><strong>scripts</strong> </em>folder called <em><strong>app05.r</strong></em>.&nbsp;</li>
+<li>Open the data frame created in this lesson: <strong>LansingNOAA2016-2.csv</strong></li>
+<li>Do a histogram of average humidity -- add titles and appropriate labels.</li>
+<li>Create a column in your data frame called <em><strong>biMonth</strong> </em>that divides the year into 6 categories: JanFeb, MarApr, MayJun, JulAug, SepOct, and NovDec</li>
+<li>Using faceting, <em><strong>facet_grid()</strong></em>, create a separate histogram for each <em><strong>biMonth</strong> </em>category</li>
+<li>Create a stacked histogram, using <em><strong>fill</strong> </em>subcomponent, of average humidity using <em><strong>biMonth</strong></em>
+<ul>
+<li>Add two vertical lines that give the mean relative humidity for <strong>JanFeb</strong> and <strong>JulAug</strong>.
+<ul>
+<li>Hint: you want to find the mean of the values in the <strong>relHum</strong> column and <strong>JanFeb</strong> (<strong>JulAug</strong>) rows</li>
+</ul>
+</li>
+<li>Challenge: The legend is currently wasting a lot of white-space on the right side of the plot. Move the legend over the plot in a way that it does not cover the plot data. (in <em class="ref" id="r-legend">extension </em>and lesson 7)</li>
+<li>Challenge: The months are in alphabetical order instead of ordered by date.&nbsp; Change the order of the months by date -- this is covered in detail in the next lesson.</li>
+</ul>
+</li>
+</ol>
+<h3>Questions</h3>
+<ol>
+<li>What was your level of comfort with the lesson/application?</li>
+<li>What areas of the lesson/application confused or still confuses you?</li>
+<li>What are some things you would like to learn related to, but not covered in, this lesson?</li>
+</ol>
+<h2 class="extension" id="which">Extension: using which() to find index values</h2>
+<p>We can use <em><strong>which()</strong></em> to get the index values for the dates.<em><strong></strong></em></p>
+<p></p>
+<p>A <em><strong>which()</strong></em> gives the index of the values in the vector that meet a condition.</p>
+<p></p>
+<p>So, to find the Spring dates, we ask which dates are later than <em><strong>springStart</strong> <strong>AND</strong> </em>earlier than <em><strong>summerStart</strong></em>:</p>
+<h6>springIndex = which(theDate &gt;= springStart &amp; theDate &lt; summerStart);</h6>
+<p class="note">Note: the logical condition is a single <strong>&amp;</strong> instead of a double <strong>&amp;&amp;</strong></p>
+<p></p>
+<p>The vector, <strong></strong><em><strong>springIndex, </strong></em>is populated by the <strong>92</strong> index values representing the dates between March 21 (<strong>81<sup>st</sup></strong> day of year) and June 20 (<strong>172<sup>nd</sup></strong> day of year).</p>
+<p></p>
+<p><img src="../Images/GGP-01-05-SpringIndex.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5><strong>springVector</strong> has 92 values: the 92 numbers from 81-172</h5>
+<p></p>
+<p>The procedure is similar for summer and fall:</p>
+<h6 class="nn">summerIndex = which(theDate &gt;= summerStart &amp; theDate &lt; fallStart);<br>fallIndex = which(theDate &gt;= fallStart &amp; theDate &lt; winterStart);</h6>
+<p></p>
+<p>And, for winter, we need to switch the logical condition to <em><strong>OR</strong> </em>because the winter date are not continuous:</p>
+<h6 class="nn">winterIndex = which(theDate &gt;= winterStart | theDate &lt; springStart);</h6>
+<p></p>
+<p>Unlike the three other season vectors, <em><strong>winterIndex</strong> </em>has discontinuous values (<strong>1-80</strong> then <strong>356-366</strong>) representing the fact that winter days happen at both the beginning and end of the calendar year.</p>
+<p></p>
+<p><img src="../Images/GGP-01-05-WinterIndex.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5><strong>winterIndex</strong> has 91 values: 1-81 and 357-366</h5>
+<p></p>
+<h3>Save the season to a data frame column</h3>
+<p>We have the index values for the days of each season --we can use the index value to set the season values in the <em><strong>season</strong> </em>vector.</p>
+<h6># Using the index values to set the season values <br>season[springIndex] = "Spring"; &nbsp; # sets values 81-172 to spring<br>season[summerIndex] = "Summer";&nbsp;&nbsp; # sets values 173-264 to summer<br>season[fallIndex] = "Fall";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # sets values 265-356 to fall<br>season[winterIndex] = "Winter";&nbsp;&nbsp; # sets values 1-80, 357-366 to winter</h6>
+<p></p>
+<p>We can then save the vector to the <em><strong>weatherData</strong> data frame</em>:</p>
+<h6 class="nn"># Save the season vector to weatherData</h6>
+<h6 class="nn">weatherData$season = season;</h6>
+<p></p>
+<p><img src="../Images/GGP-01-05-SeasonColumn.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>The new column in <strong>weatherData</strong> called season (note: the number of variables went from 23 to 24)</h5>
+<h2 class="extension" id="legend">Extension: Quick Legend changes</h2>
+<p>GGPlot automatically adds a legend when the <em><strong>fill </strong></em>parameter is used in <em><strong>mapping</strong></em>.&nbsp; If you do not want a legend in your plot you can modify the parameter <em><strong>legend.position</strong></em> in the <em><strong>theme()</strong></em> component:</p>
+<h6 class="nn">theme(legend.position="none")</h6>
+<p></p>
+<p><img src="../Images/GGP-01-05-NoLegend.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Removing the legend</h5>
+<p></p>
+<p>You can also use <em><strong>legend.position</strong></em> to reposition the legend where <em><strong>x</strong></em> and <em><strong>y</strong></em> are both values from 0 to 1</p>
+<h6 class="nn">theme(legend.position= c(x=0.15, y=0.75) )</h6>
+<p></p>
+<p><img src="../Images/GGP-01-05-PositionLegend.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Repositioning the legend</h5>
+</body></html>

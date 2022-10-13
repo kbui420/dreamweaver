@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head>
+	<title></title>
+	<meta charset="UTF-8">
+	 <script type="text/javascript"> document.write('<'+'!--'); </script>
+       <link rel="stylesheet" type="text/css" href="/content/DEVELOPMENT/2018/courses/DEV-belinsky-2018-BackendTest/Programming/Release/editor.css">
+    <!-- -->
+	<script>
+const D2LMathML="";
+		var scriptFile = document.createElement('script');
+		scriptFile.src = "https://cdn.jsdelivr.net/gh/QFCatMSU/OnlineClassBackEnd/module.js";
+		document.getElementsByTagName('head')[0].appendChild(scriptFile);
+	</script>
+</head>
+
+<body>
+<p class="previousLesson">Plot Styles</p>
+<p class="nextLesson">Histograms</p>
+<h1 class="title" id="title">01-04: Date objects and canvas styles</h1>
+<h3>Future improvements</h3>
+<p>Use unique names for each plot.&nbsp; It does not change the execution of the code in this lesson but it is good practice.</p>
+<h2>Purpose</h2>
+<ul>
+<li>Applying styles to the plot paneling and axes</li>
+<li>Handling and manipulating date variables</li>
+<li>Applying limits and spacing to discrete and continuous axes</li>
+<li>Modifying a data frame</li>
+</ul>
+<h2>Get data</h2>
+<p>Like last lesson, we are going to use the weather data from the file&nbsp;<a href="https://cdn.jsdelivr.net/gh/QFCatMSU/GGPlot-Class-Material/data/LansingNOAA2016.csv" target="_self" class="download">LansingNOAA2016.csv</a> and save it to a data frame called <em><strong>weatherData</strong> </em>(<em class="ref" id="r-dataframe">fig ##</em>).&nbsp;</p>
+<p></p>
+<h6 class="p">source(file="scripts/reference.R");&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>weatherData = read.csv(file="data/LansingNOAA2016.csv", <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stringsAsFactors = FALSE);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-04-DateWithoutYear.PNG" alt="" class="fs"></p>
+<h5 class="" id="dataframe"><strong>weatherData </strong>data frame, note that the<strong> date</strong> column has only the month and day (no year)</h5>
+<p></p>
+<p>This time we are going to plot <em><strong>avgTemp</strong> </em>vs. <em><strong>date</strong></em>.&nbsp; However, if we look at the values in the <em><strong>date</strong> </em>column (<em class="ref" id="r-dataframe">fig ##</em>), we see that there is no year given -- the year is assumed to be 2016, since that is in the file name.&nbsp;</p>
+<p></p>
+<p>This is a problem as GGPlot will only treat a data column as dates if the values in the column are properly formed (i.e., the values have a month, date, <em class="hl">and year</em>).&nbsp; If the date is not properly formed, then GGPlot will treat the column as string (or character) values.</p>
+<h2>Adding the year to the date values</h2>
+<p>We are going to create a data column in the <em><strong>weatherData</strong> </em>data frame that has properly formed date values (i.e., with the year 2016 in it).&nbsp; Since <em class="hl">it is generally not a good idea to directly modify values in a data frame</em>, we are going to make a copy of the <em><strong>date</strong> </em>column, called <em><strong>dateYr</strong></em>, and modify the <em><strong>dateYr</strong> </em>column instead.</p>
+<p></p>
+<p>We will break down this process into four steps:&nbsp;</p>
+<ol>
+<li>Save the <em><strong>date</strong> </em>column in <em><strong>weatherData</strong> </em>to a vector</li>
+<li>Append the year, <strong>2016</strong>, to all values in the vector</li>
+<li>Convert the string vector into a date vector</li>
+<li>Save the vector back to the data frame</li>
+</ol>
+<p></p>
+<p class="note">Note: There are quicker ways to do this but it is important to understand the individual steps.</p>
+<h3>Save the date column to a vector</h3>
+<p>There are many different ways in R to save a column in a data frame to a vector.&nbsp; The three most common ways are presented below, the last two are commented out so they will not be executed:</p>
+<h6 class="p">#### Part 1: Add year to date values ####<br># a) save the date vector from the data frame to the variable theDate</h6>
+<h6 class="p">theDate = weatherData$date; &nbsp; &nbsp; &nbsp; &nbsp; # get all values from the dates column<br># theDate = weatherData[["date"]];&nbsp; # equivalent to previous line<br># theDate = weatherData[ , "date"]; # equivalent to previous 2 lines in base R</h6>
+<p></p>
+<p>I choose to use the first method for two reasons:</p>
+<ol>
+<li>When you type in <em><strong>$</strong></em> after <em><strong>weatherData</strong></em>, RStudio will suggest a list of column names from <em><strong>weatherData</strong></em></li>
+<li>It works for both R-base data frames and TidyVerse tibbles</li>
+</ol>
+<p></p>
+<p class="ref" id="e-tibbles">Extension: R data frames and TidyVerse tibbles</p>
+<p></p>
+<p><img src="../Images/GGP-01-04-SaveColToVector.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Saving the date column to a vector (note: the vector contains 366 string, or <strong>chr</strong>, values -- not <strong>date</strong> values)</h5>
+<p></p>
+<p class="ref" id="r-range">Extension: get a range of values from the column</p>
+<h3>Append the year to the date</h3>
+<p>Now we want to append, or paste,<strong> </strong><em><strong></strong></em>the year on to every date value in the string vector <em><strong>theDate</strong></em>.&nbsp; We will use <em><strong>paste()</strong></em> and there are three parameters to set:</p>
+<ol>
+<li>The initial values: <em><strong>theDate</strong></em></li>
+<li><em></em>The value being appended or pasted: <strong>"-2016"</strong></li>
+<li>The separator between initial and pasted values: in this case, an empty string, "" <em class="note"></em></li>
+</ol>
+<p></p>
+<h6 class="p"># append (paste) "-2016" to all values in theDate</h6>
+<h6 class="p">theDate = paste(theDate, "-2016", sep="");&nbsp;&nbsp;&nbsp;</h6>
+<h6 class="p"># theDate = paste(theDate, "2016", sep="-");&nbsp; # functionally equivalent to the previous line</h6>
+<p></p>
+<p class="ref" id="r-paste">Extension: more details about<strong> paste() </strong>and the reason why parameter names are not used for the first two values<strong><br></strong></p>
+<p></p>
+<p><img src="../Images/GGP-01-04-PasteYear.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Pasting the year to all values in the vector</h5>
+<h3>Convert the vector into a date vector</h3>
+<p>At this point, R sees the values in <em><strong>theDate</strong> </em>as strings (or <em><strong>chr</strong></em>) <em class="hl">not <strong>dates</strong></em>.</p>
+<p></p>
+<p>Now we need to tell R:</p>
+<ul>
+<li>this vector contains dates (as opposed to strings) and</li>
+<li>how the dates values are formatted</li>
+</ul>
+<p></p>
+<p>We can do both using <em><strong>as.Date()</strong></em>, and modifying two parameters:<strong></strong><em><strong><br></strong></em></p>
+<ol>
+<li>the object we want to convert to dates (in this case, the vector <em><strong>theDate</strong></em>)</li>
+<li>the <em><strong>format</strong> </em>that the dates are in, which is: <strong>%m-%d-%y</strong></li>
+</ol>
+<ul class="" style="margin-left: 20px;">
+<li>
+<p><em><strong>%m</strong></em>: 2-digit month (00-12)</p>
+</li>
+<li>
+<p><em><strong>%d</strong></em>: 2-digit date (00-31)</p>
+</li>
+<li>
+<p><em><strong>%Y</strong></em>: 4-digit year (2016)&nbsp;</p>
+<ul>
+<li>
+<p><em class="note">note: lowercase<strong> y</strong> is a 2-digit year whereas capital <strong>Y</strong> is a 4-digit year<br></em></p>
+</li>
+<li><em class="ref" id="r-yearparam">Trap: using the wrong parameter for year (lowercase<strong> y</strong> vs. capital <strong>Y</strong>)</em></li>
+</ul>
+</li>
+<li>
+<p><em><strong>-</strong></em>: dashes used to separate month, day, and year values</p>
+</li>
+</ul>
+<p><em><strong>&nbsp;</strong></em><em><strong></strong></em></p>
+<h6 class="p"># c) Save the values in Date format</h6>
+<h6 class="p">theDate = as.Date(theDate, format="%m-%d-%Y");</h6>
+<p></p>
+<p><img src="../Images/GGP-01-04-DateFormat.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Now R recognizes the values in the vector as <strong>Date</strong> values</h5>
+<h3>Save the date vector to the data frame</h3>
+<p>We have the vector in date format, now we need to save the values back to a new column in the data frame.&nbsp; This is pretty much the reverse of the first step and, again, there are multiple ways to do it -- I present three ways and comment out the last two.</p>
+<p></p>
+<p>In each case, we are saving <em><strong>theDate</strong> </em>to the column in <em><strong>weatherData</strong> </em>called <em><strong>dateYr</strong></em>:</p>
+<h6 class="p"># d) Save theDate back to the data frame as a new column</h6>
+<h6 class="p">weatherData$dateYr = theDate;</h6>
+<h6 class="p"># weatherData[["dateYr"]] = theDate; # equivalent to previous line<br># weatherData[, "dateYr"] = theDate; # equivalent to previous 2 lines in base R</h6>
+<p></p>
+<p><img src="../Images/GGP-01-04-SaveVectorToDF.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>The data frame now has a new column, <strong>dateYr</strong>, with properly formatted dates</h5>
+<p></p>
+<p>Now that we have a column with properly formatted date values, we can move to plotting the data....</p>
+<h2>Line plots</h2>
+<p>In the last lesson, we plotted points using the plotting component <em><strong>geom_point()</strong></em>.&nbsp; In this lesson we are going use the plotting component <em><strong>geom_line(),&nbsp;</strong></em>which will connect the points and make a line plot<em><strong></strong></em>.&nbsp;</p>
+<p></p>
+<p>We are going to use <em><strong>geom_line()</strong> </em>twice, to plot:</p>
+<ol>
+<li><em><strong>maxTemp</strong> vs </em><strong>date</strong></li>
+<li><em><strong>minTemp</strong> </em>vs <em><strong>date</strong></em></li>
+</ol>
+<p><em><strong></strong></em></p>
+<p><em></em>In GGPlot, you can put multiple plots on one graph using ( <strong>+</strong> ), the code below says that we are going to put two <em><strong>geom_line()</strong></em> components in the plot area :</p>
+<h6>plotData = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_line(mapping=aes(x=dateYr, y=maxTemp)) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_line(mapping=aes(x=dateYr, y=minTemp));<br>plot(plotData);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-04-LinePlots.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Two line graphs: <strong>maxTemp</strong> vs <strong>Date</strong> and <strong>minTemp</strong> vs <strong>Date</strong></h5>
+<h3>Add labels and coloring</h3>
+<p>Now we are going to:</p>
+<ul>
+<li>visually separate the two plots by setting the <em><strong>color </strong></em>subcomponent in <em><strong>geom_line()</strong></em></li>
+<li>add titles and axis labels using the<em><strong> labs()</strong></em> component <em class="note"></em></li>
+</ul>
+<p></p>
+<h6>#### Part 3: Add labels and colors ###</h6>
+<h6>plotData = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_line(mapping=aes(x=dateYr, y=maxTemp),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">color="palevioletred1"</em>) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_line(mapping=aes(x=dateYr, y=minTemp),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">color="aquamarine2"</em>) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">labs(</em>title = "Temperature vs. Date",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Date",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Temperature (F)"<em class="hl">)</em>;<br>plot(plotData);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-04-ColorAndLabels.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Changing the line plot colors and adding titles ans axis labels</h5>
+<p></p>
+<p>We will deal with the lack of contrast between the plots and the plot area background in a bit...</p>
+<h3>Add a smoothing function</h3>
+<p>On the graph, we are going to add another component that represents the average temperature (<em><strong>avgTemp</strong></em>) and use a method that smooths out the values.&nbsp; Like last lesson, we use <em><strong>geom_smooth()</strong></em>, but we will use a different smoothing method this time (<em><strong>loess</strong></em>).&nbsp;</p>
+<p></p>
+<h6>#### Part 4: Add average temperature and smooth it out ###</h6>
+<h6>plotData = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_line(mapping=aes(x=dateYr, y=maxTemp),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="palevioletred1") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_line(mapping=aes(x=dateYr, y=minTemp),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="aquamarine2") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em class="hl">&nbsp; geom_smooth(mapping=aes(x=dateYr, y=avgTemp), </em></h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">color="orange", </em><br><em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </em><em class="hl">method="loess", </em></h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">linetype=4, </em></h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">fill="lightblue")</em> +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Temperature vs. Date",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Date",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Temperature (F)");<br>plot(plotData);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-04-Smoothing.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="averageTemp">Adding <strong>avgTemp</strong> as a smoothed plot and styled the line</h5>
+<h2>Paneling changes and greyscaling</h2>
+<p>The paneling for the graph is essentially the background of the plot area, and it consists of a fill color and axes lines that go across it.&nbsp; In <em class="ref" id="r-averageTemp">figure ##</em>, the fill color is gray and the axis lines are white.</p>
+<p></p>
+<p>Paneling changes are made using the <em><strong>theme()</strong></em> component, and the subcomponents we are modifying are:</p>
+<ul>
+<li><em><strong>panel.background</strong></em>: a <em class="hl">rectangular element</em> representing the background of the plot area</li>
+<li><em><strong>panel.grid.major</strong></em>: a <em class="hl">line element </em>representing the main axis lines that go across the plot area</li>
+<li><em><strong>panel.grid.minor</strong></em>: a <em class="hl">line element</em> representing the the halfway axis lines that go across the plot area</li>
+</ul>
+<p></p>
+<p>We are using <em class="hl">greyscale</em> to set the color of the various objects.&nbsp; In GGPlot, you can choose greyscale colors between <em><strong>grey0</strong> </em>(black) and <em><strong>grey100</strong></em> (white).&nbsp; You can think of the number after <em><strong>grey</strong> </em>as the percentage of light from <em><strong>0</strong></em> (none) to <em><strong>100</strong> </em>(all).</p>
+<p></p>
+<h6>#### Part 5: Paneling changes ###</h6>
+<h6># grey0 is black, grey100 is white, and numbers in between are shades of grey</h6>
+<h6>plotData = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_line(mapping=aes(x=dateYr, y=maxTemp),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="palevioletred1") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_line(mapping=aes(x=dateYr, y=minTemp),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="aquamarine2") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_smooth(mapping=aes(x=dateYr, y=avgTemp),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="orange", <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; method="loess",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; linetype=4,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fill="lightblue") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Temperature vs. Date",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Date",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Temperature (F)") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # size and color relate to the border, fill is the inside color <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme(<em class="hl">panel.background</em> = element_rect(fill="grey25",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size=2, color="grey0"),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">panel.grid.minor</em> = element_line(color="grey50", linetype=4),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">panel.grid.major</em> = element_line(color="grey100"));</h6>
+<h6>plot(plotData);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-04-Paneling.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="paneling">Paneling changes to the graph</h5>
+<h3>GGPlot Elements</h3>
+<p>In GGPlot, many of the subcomponents of a plot (including the paneling) are set to an element object (e.g., <em><strong>element_line</strong></em>, <em><strong>element_rect</strong></em>).&nbsp;</p>
+<p></p>
+<p>In the above plot (<em class="ref" id="r-paneling">fig ##</em>), we changed:</p>
+<p><em><strong>panel.background</strong></em> is set to a <em class="hl">rectangular element</em> (<em><strong>element_rect</strong></em>) with parameters:</p>
+<ul>
+<li><em><strong>fill = "grey25"</strong></em>: set the inside color to a dark grey (25% light)</li>
+<li><em><strong>size = 2</strong></em>: set the size of the border to 2 millimeters (default is 1mm)</li>
+<li><em><strong>color = "grey0"</strong></em>: set the border color to black (0% light)</li>
+</ul>
+<p></p>
+<p><em><strong>panel.grid.minor </strong></em>is set to a <em class="hl">line element</em> (<em><strong>element_line</strong></em>) with parameters:</p>
+<ul>
+<li><em><strong>color = "grey50"</strong></em>: set the line color to a medium grey</li>
+<li><em><strong>linetype = 4</strong></em>: set the line type to be alternating long dashes and short dashes</li>
+</ul>
+<p><em><strong></strong></em></p>
+<p><em><strong>panel.grid.major </strong></em>is a <em class="hl">line element</em> (<em><strong>element_line</strong></em>) with parameter:</p>
+<ul>
+<li><em><strong>color = "grey100"</strong></em>: set the line color to white (100% light)</li>
+</ul>
+<h2>Outside the panel changes</h2>
+<p>Now we are going to use <em><strong>theme()</strong></em> component to change the properties of canvas area outside of the plots.&nbsp;</p>
+<p></p>
+<p>The subcomponents we are going to change are:</p>
+<ul>
+<li><em><strong>plot.background</strong></em>: the background outside the plot area (rectangular element)</li>
+<li><em><strong>plot.title:</strong></em> the text that represents the title of the graph (text element)</li>
+<li><em><strong>plot.subtitle:</strong></em> the text that represent the subtitle of the graph (text element)</li>
+<li><em><strong>axis.text:</strong></em> the text that represents the labels on the x and y axes (text element)</li>
+</ul>
+<p></p>
+<h6>#### Part 6: Making changes outside the panel ###</h6>
+<h6>plotData = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_line(mapping=aes(x=dateYr, y=maxTemp),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="palevioletred1") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_line(mapping=aes(x=dateYr, y=minTemp),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="aquamarine2") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_smooth(mapping=aes(x=dateYr, y=avgTemp),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="orange", <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; method="loess",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; linetype=4,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fill="lightblue") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Temperature vs. Date",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Date",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Temperature (F)") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # size and color relate to the border, fill is the inside color <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme(panel.background = element_rect(fill="grey25",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size=2, color="grey0"),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; panel.grid.minor = element_line(color="grey50", linetype=4),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; panel.grid.major = element_line(color="grey100"),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">plot.background</em> = <em class="hl">element_rect</em>(fill = "lightgreen"),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">plot.title</em> = <em class="hl">element_text</em>(hjust = 0.45),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">plot.subtitle</em> = <em class="hl">element_text</em>(hjust = 0.42),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">axis.text</em> = <em class="hl">element_text</em>(color="blue", family="mono", size=9));</h6>
+<h6>plot(plotData);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-04-OutsidePanel.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="styleChange">Style changes outside of the plot area</h5>
+<p><em><strong></strong></em></p>
+<p><em><strong>plot.background</strong></em> is set to a rectangular element (<em><strong>element_rect</strong></em>) with parameter:</p>
+<ul>
+<li><em><strong>fill = "lightgreen"</strong></em>: set the background color outside the plot area to light green</li>
+</ul>
+<p><em><strong></strong></em></p>
+<p><em><strong>plot.title </strong></em>is set to a text element (<em><strong>element_text</strong></em>) with parameter:</p>
+<ul>
+<li><em><strong>hjust= 0.45</strong></em>: set the horizontal justification of the text to almost the center<em><strong></strong></em></li>
+</ul>
+<p></p>
+<p>note:<strong></strong><em><strong> hjust </strong></em>has values from <em><strong>0.0</strong></em> (left justified text) to <em><strong>1.0</strong></em> (right justified text) and <em><strong>0.5</strong></em> is centered</p>
+<p><em><strong></strong></em></p>
+<p><em><strong>plot.subtitle </strong></em>is set to a text element (<em><strong>element_text</strong></em>) with parameter:</p>
+<ul>
+<li><em><strong>hjust= 0.42</strong></em>: set the horizontal justification of the text to line up underneath the title<em><strong></strong></em></li>
+</ul>
+<p><em><strong></strong></em></p>
+<p><em><strong>axis.text</strong></em> is set to a text element (<em><strong>element_text</strong></em>) that represents the text labels on the x and y axes.&nbsp;</p>
+<p>We change the parameters:</p>
+<ul>
+<li><em><strong>color= "blue"</strong></em>: set the text color to <strong>blue</strong></li>
+<li>
+<p><em><strong>family="mono"</strong></em>: set the font type to <strong>mono</strong></p>
+</li>
+<li><strong>size=9: </strong>set the font size to<strong> 9</strong> pixels<em><br></em></li>
+</ul>
+<p></p>
+<p>If you want to individually change the x-axis text style or y-axis text style you can use the components: <em><strong>axis.text.x</strong></em> and <em><strong>axis.text.y</strong></em></p>
+<p></p>
+<p class="note">Note: Changing the font family can cause issues because different computer have different fonts installed.</p>
+<h2>Scaling axis values</h2>
+<p>GGPlot does a decent job of generating axes values and setting the distance between tick marks, but there are times you want to change these values.</p>
+<p></p>
+<p>In the above plot (<em class="ref" id="r-styleChange">fig ##</em>), the<em class="hl"> x-axis has discrete values</em> (GGPlot treats dates as discrete) and the <em class="hl">y-axis has continuous values</em> -- we will look at these two cases separately.</p>
+<h3>Scaling continuous axis values</h3>
+<p>Temperature is on the y-axis of the plot and it is continuous, so the component of GGPlot that controls its scaling is: <em><strong>scale_y_continuous.</strong></em></p>
+<p><em><strong></strong></em></p>
+<p><em></em>We need to set two subcomponents of <em><strong>scale_y_continuous</strong></em>:</p>
+<ul>
+<li><em><strong>limits</strong></em>: a vector that contains the low and high value of the y-axis (set to <strong>-15</strong> and <strong>90</strong>)</li>
+<li><em><strong>breaks</strong></em>: a sequence that gives the tick marks (set to interval of <strong>20</strong> between <strong>-15</strong> and <strong>90</strong>)</li>
+</ul>
+<p></p>
+<h6>#### Part 7: Scaling continuous values ###</h6>
+<h6>plotData = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_line(mapping=aes(x=dateYr, y=maxTemp),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="palevioletred1") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_line(mapping=aes(x=dateYr, y=minTemp),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="aquamarine2") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_smooth(mapping=aes(x=dateYr, y=avgTemp),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="orange", <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; method="loess",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; linetype=4,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fill="lightblue") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;labs(title = "Temperature vs. Date",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Date",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Temperature (F)") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme(panel.background = element_rect(fill="grey25",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size=2, color="grey0"),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; panel.grid.minor = element_line(color="grey50", linetype=4),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; panel.grid.major = element_line(color="grey100"),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em> plot.background = element_rect(fill = "lightgreen"),</em><br><em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; plot.title = element_text(hjust = 0.45),</em><br><em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; plot.subtitle = element_text(hjust = 0.42),</em><br><em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; axis.text = element_te</em>xt(color="blue", family="mono", size=9))+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; <em class="hl">scale_y_continuous(limits = c(-15,90),</em><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">breaks = seq(from=-15, to=90, by=20))</em>; <em class="hl"><br></em></h6>
+<h6>plot(plotData);</h6>
+<p><em><strong>&nbsp;</strong></em></p>
+<p><img src="../Images/GGP-01-04-ContinuousScale.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="scale-cont">Scaling the continuous y-axis (temperatures)</h5>
+<p></p>
+<p>The y-axis (<em class="ref" id="r-scale-cont">fig ##</em>) goes a little beyond the limits of <strong>-15</strong> and <strong>90</strong> -- this is because GGPlot always adds a bit of cushioning at the ends.&nbsp;</p>
+<p></p>
+<p>The tick marks on the y-axis (<em class="ref" id="r-scale-cont">fig ##</em>) are at: <strong>5, 25, 45, 65</strong>, and <strong>85</strong> -- and there are minor tick marks halfway in-between at: <strong>-5, 15, 35, 55,</strong> and <strong>75</strong>.</p>
+<h3>Scaling date axis values</h3>
+<p>Date is on the x-axis of the plot and the component of GGPlot that controls its scaling is: <em><strong>scale_x_date.</strong></em></p>
+<p><em><strong></strong></em></p>
+<p><em></em>We need to set two subcomponents of <em><strong>scale_x_date</strong></em>:</p>
+<ul>
+<li><em><strong>limits</strong></em>: a vector that gives the low and high value of the x-axis (set to March 21 and December 21)</li>
+<li><em><strong>date_breaks</strong></em>: a sequence that gives the tick marks (set to 6 week intervals)</li>
+</ul>
+<p></p>
+<p>We are also going to format the dates to 2-digit months and 2-digit days using the<em><strong> date_</strong><strong>labels</strong> </em>parameter.</p>
+<p></p>
+<p><em><strong>date_labels = format("%m/%d")</strong></em> means the date will be represented by:</p>
+<ul>
+<li>a 2-digit month (<em><strong>%m</strong></em>)</li>
+<li>a front-slash separator (<em><strong>/</strong></em>)</li>
+<li>a 2-digit day (<em><strong>%d</strong></em>)</li>
+</ul>
+<p></p>
+<h6>#### Part 8: Scaling discrete values (dates) ###</h6>
+<h6>plotData = ggplot(data=weatherData) + <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_line(mapping=aes(x=dateYr, y=maxTemp),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="palevioletred1") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_line(mapping=aes(x=dateYr, y=minTemp),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="aquamarine2") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_smooth(mapping=aes(x=dateYr, y=avgTemp),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="orange", <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; method="loess",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; linetype=4,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fill="lightblue") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;labs(title = "Temperature vs. Date",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Date",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Temperature (F)") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # size and color relate to the border, fill is the inside color <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme(panel.background = element_rect(fill="grey25",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size=2, color="grey0"),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; panel.grid.minor = element_line(color="grey50", linetype=4),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; panel.grid.major = element_line(color="grey100"),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em> plot.background = element_rect(fill = "lightgreen"),</em><br><em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; plot.title = element_text(hjust = 0.45),</em><br><em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; plot.subtitle = element_text(hjust = 0.42),</em><br><em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; axis.text = element_te</em>xt(color="blue", family="mono", size=9))+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_y_continuous(limits = c(-15,90),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; breaks = seq(from=-15, to=90, by=20)) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">scale_x_date(limits=c(as.Date("2016-03-21"), </em></h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">as.Date("2016-12-21")),</em><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">date_breaks = "6 weeks", </em></h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">date_labels = format("%m/%d")</em>);</h6>
+<h6>plot(plotData);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-04-DiscreteScale.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="scale-date">Scaling the Date axis</h5>
+<p></p>
+<p>The warning message in the Console Window (<em class="ref" id="r-scale-date">fig ##</em>) is pointing out that you have cut off 90 days of data from each of the three plot.&nbsp; The 90 days represent <strong>January 1</strong> to <strong>March 20</strong> and <strong>December 22</strong> to <strong>December 31</strong> -- the days outside the <strong>limits</strong> set in <strong>scale_x_date</strong>.</p>
+<h2 class="">Application</h2>
+<ol>
+<li>Create a script file in your Project's <em><strong>script</strong> </em>folder called <em><strong>app04.r</strong></em>.&nbsp;</li>
+<li>Create a date column that includes the year (same as in lesson)</li>
+<li>Convert the three temperature columns in the data frame from Fahrenheit to Celsius<br><math title="" xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><semantics><mstyle><mi>C</mi><mo>&nbsp;</mo><mo>=</mo><mfrac><mn>5</mn><mn>9</mn></mfrac><mo>(</mo><mi>F</mi><mo>&nbsp;</mo><mo>-</mo><mo>&nbsp;</mo><mn>32</mn><mo>)</mo></mstyle><annotation encoding="wiris">{"version":"1.1","math":"&lt;math xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;mi&gt;C&lt;/mi&gt;&lt;mo&gt;&amp;#xA0;&lt;/mo&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mfrac&gt;&lt;mn&gt;5&lt;/mn&gt;&lt;mn&gt;9&lt;/mn&gt;&lt;/mfrac&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;F&lt;/mi&gt;&lt;mo&gt;&amp;#xA0;&lt;/mo&gt;&lt;mo&gt;-&lt;/mo&gt;&lt;mo&gt;&amp;#xA0;&lt;/mo&gt;&lt;mn&gt;32&lt;/mn&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;/math&gt;"}</annotation></semantics></math></li>
+<li>For the Celsius Temperatures -- on one plot:
+<ul>
+<li>make a line plot of high temp vs date</li>
+<li>make a line plot of low temp vs date</li>
+<li>make a smoothed plot of average temp</li>
+</ul>
+</li>
+<li>Add appropriate labels to the axis and a title.</li>
+<li>Right-justify the title and subtitle</li>
+<li>Only show Spring and Summer dates on the plot (i.e., March 21 through Sept 21)</li>
+<li>Set the axis limits and tick marks so that:
+<ol>
+<li>the full range of high and low temperatures can be seen</li>
+<li>there are 3 ticks on the x-axis and 4 ticks on the y-axis</li>
+</ol>
+</li>
+<li>Set the color of the x-axis labels to blue</li>
+<li>Set the color of the y-axis labels to red</li>
+<li>Display the dates in this format:&nbsp; Jun-28-2016 (abbreviated month, 2-digits for days, and four digits for years)
+<ul>
+<li>Go to <a href="https://www.statmethods.net/input/dates.html" target="_blank" rel="noopener">this page</a> for help on formatting the dates</li>
+</ul>
+</li>
+</ol>
+<h3>Questions</h3>
+<ol>
+<li>What was your level of comfort with the lesson/application?</li>
+<li>What areas of the lesson/application confused or still confuses you?</li>
+<li>What are some things you would like to learn related to, but not covered in, this lesson?</li>
+</ol>
+<h2 class="extension" id="range">Extension: Getting a range of values in a column</h2>
+<h6 class="p">weatherData[3, "date"];&nbsp;&nbsp; # get the 3rd value from the date column</h6>
+<h6>weatherData[3:7, "date"];&nbsp;&nbsp; # get the 3rd through 7th values from the date column</h6>
+<h6>weatherData[seq(from=2, by=2), "date");&nbsp;&nbsp; # get all even values in the date column</h6>
+<p></p>
+<h2 class="trap" id="yearparam">Trap: Using the wrong parameter for year</h2>
+<p><em><strong>%Y</strong></em> means that the year is in the 4-digit format, whereas</p>
+<p><em><strong>%y</strong></em> means that the year is in the 2-digit format</p>
+<p></p>
+<p>If you put in the wrong parameter value (lowercase <em><strong>y</strong></em> instead of uppercase<em><strong> Y</strong></em>):</p>
+<h6>theDate = as.Date(theDate, format="%m-%d-<em class="hl">%y</em>");</h6>
+<p></p>
+<p>then you will get an unusual result:</p>
+<p><img src="../Images/GGP-01-04-PastingYearError.PNG" alt="" data-d2l-editor-default-img-style="true" class="fs" style="max-width: 100%;"></p>
+<h5>The year is now 2020 instead of 2016</h5>
+<p></p>
+<p><strong>%y</strong> tells R to take the first two values of the number and make that the year.&nbsp; The first two values of the year <strong>2016</strong> is <strong>20</strong> -- so the <strong>16</strong> is dropped.&nbsp; R then assumes we are in the 21<sup>st</sup> century so R assumes the year is 20<strong>20</strong>.</p>
+<h2 class="extension" id="paste">Extension: more about paste()</h2>
+<p>The help page can be accessed in RStudio by going to the <em><strong>Help</strong> </em>tab in the lower-left corner and searching for <strong>paste</strong>.</p>
+<p></p>
+<p>If we go to the help page for <em><strong>paste()</strong></em>, it gives the usage for<em><strong> paste()</strong> </em>as:</p>
+<h6>paste (..., sep = " ", collapse = NULL)</h6>
+<p></p>
+<p><em><strong>( ..., ) </strong></em>means that <em><strong>paste()</strong></em> will accept any number of initials values -- these are the values that <em><strong>paste()</strong> </em>will attempt to paste together.&nbsp; <em class="hl">These values do not have a parameter name</em>.&nbsp; When using <em><strong>paste()</strong></em>, you must use parameter names for <em><strong>sep</strong> </em>and <em><strong>collapse</strong></em>, otherwise <em><strong>paste()</strong></em> will see these value as part of the initial set of values to be pasted together.&nbsp; There are many functions in R that accept an indeterminate number of unnamed (i.e., no parameter name) values at the beginning of a function.&nbsp;&nbsp;</p>
+<p></p>
+<p><em><strong>sep</strong> </em>= " " means the default separator value is one space.&nbsp; So, if you do not set <em><strong>sep</strong></em>, you will get one space between all the values that <em><strong>paste()</strong></em> is pasting together.</p>
+<h2 class="extension" id="tibbles">Extension: R data frames and tidyverse tibbles</h2>
+<p class="">In this lesson I introduce three ways to access a column from a data frame and save it to a vector:</p>
+<h6 class="p">#### Part 1: Add year to date values ####<br># a) save the date vector from the data frame to the variable theDate</h6>
+<h6 class="p">theDate = weatherData$date; &nbsp; &nbsp; &nbsp; &nbsp; # get all values from the dates column<br># theDate = weatherData[["date"]];&nbsp; # equivalent to previous line<br># theDate = weatherData[ , "date"]; # equivalent to previous 2 lines in base R</h6>
+<p></p>
+<p>All three of these methods are functionally the same on R data frames but they are functionally different if you are working with <em><strong>tibbles</strong></em>, which is a modern take on data frames used by packages in the TidyVerse.</p>
+<p></p>
+<p>The first and second methods are the same in R-base and TidyVerse but the third method:</p>
+<h6 class="p">theDate = weatherData[ , "date"];&nbsp;&nbsp; # equivalent to previous 2 lines in base R</h6>
+<p>will save the <em><strong>date</strong> </em>column <em class="hl">as a one-column tibble</em> as opposed to a vector.</p>
+<p></p>
+<p>The first method also has the advantage that as soon as you type <em><strong>weatherData$</strong></em> in RStudio, RStudio will give you suggestions.&nbsp;</p>
+</body></html>

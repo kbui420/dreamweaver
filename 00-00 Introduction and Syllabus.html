@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head>
+	<title></title>
+	<meta charset="UTF-8">
+	<script type="text/javascript"> document.write('<'+'!--'); </script>
+       <link rel="stylesheet" type="text/css" href="/content/DEVELOPMENT/2018/courses/DEV-belinsky-2018-BackendTest/Programming/Release/editor.css">
+    <!-- -->
+	<script>
+		var scriptFile = document.createElement('script');
+		scriptFile.src = "https://cdn.jsdelivr.net/gh/QFCatMSU/OnlineClassBackEnd/module.js";
+		document.getElementsByTagName('head')[0].appendChild(scriptFile);
+	</script>
+</head>
+
+<body>
+<p class="nextLesson"></p>
+<p class="nextLesson">GGPlot Installation and Setup</p>
+<h1 class="title" id="title">Introduction and Syllabus</h1>
+<h2>Welcome to Graphing with GGPlot</h2>
+<p>The purpose of this class is to introduce students to the graphing package in R called GGPlot2 and the modularization techniques used by GGPlot2 to create plots.&nbsp; GGPlot2, developed by Hadley Wickham, is a powerful data visualization tool used to make publication-quality plots and it has one of the largest, and most active, R communities.&nbsp; GGPlot2 differs from other graphing packages by separating a plot into its component parts, making the code for the plot more reusable and extensible.&nbsp;</p>
+<p>&nbsp;</p>
+<p>This class uses RStudio and is designed for students who have at least a basic background in programming -- the equivalent of one semester of R, or any similar programming language (e.g., Visual Basic, JavaScript, C++).</p>
+<p>&nbsp;</p>
+<p>Graphing with GGPlot is a self-paced and asynchronous online class. The amount of material in the class is about the same as a 1.5 credit, one semester class and students are expected to complete the class within three months.&nbsp; There are no regularly scheduled office hours but you can email or call the instructor to ask questions or set up a meeting.&nbsp; All contacts will receive a response within one business day.</p>
+<h3>Instructor</h3>
+<p><strong>Charlie Belinsky&nbsp;&nbsp;&nbsp;&nbsp;</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+<ul>
+<li>belinsky@msu.edu</li>
+<li>517-355-0126<br><br></li>
+</ul>
+<p><strong><img src="../Images/belinsky2.JPG" alt="" title="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" width="" height="200"></strong></p>
+<p><strong></strong></p>
+<p><strong>About me...</strong></p>
+<p>I started my career as a Software Engineer for Motorola in Arizona where I developed software for military radios. From there I became a high school teacher in Port Huron, MI where I taught Computer Science, Web Design, and Physical Science. After that, I worked as an Instructional Designer for the College of Education at MSU where my main project was developing the hybrid graduate program. I currently work at the QFC where my primary job is developing online classes, including this one.&nbsp; In my free time you will often find me with a backpack deep in a forest or, as my picture testifies to, hanging out on a mountain in the Northern Cascades.</p>
+<h3>Technical Support</h3>
+<p>You can contact me, Charlie, regarding technical issues.&nbsp;</p>
+<p></p>
+<p>MSU also offers <a href="https://tech.msu.edu/support/help/" target="_blank" rel="noopener noreferrer"><strong>24 hour technical support</strong></a> for students. This support includes hardware, software, and D2L.</p>
+<ul>
+<li>517-432-6200 or 844-678-6200 (toll free)</li>
+<li>email: ithelp@msu.edu</li>
+<li>Make sure you have your MSU ID or MSU Guest (Community) ID when communicating with support.</li>
+<li>Remember your <em class="hl">MSU Guest ID is the email you log into class with</em> if you don't have an MSU email.</li>
+</ul>
+<h3>Requirements</h3>
+<p>Students should be familiar with basic programming structures like <em><strong>if...else</strong></em>, <em><strong>for()</strong></em>, and <em><strong>functions</strong> </em>-- material covered in a typical first semester programming class.&nbsp; All material for this course is online -- no textbooks are required.</p>
+<h3>Tech requirements</h3>
+<p><strong>Hardware:</strong>&nbsp; Any Windows, Mac, or Linux machine from the past ten years that has updates installed can handle all the hardware and software requirements of this class.&nbsp; Preferably the computer has a webcam and microphone for videoconferencing.</p>
+<p></p>
+<p><strong>Browser:</strong> <a href="https://www.mozilla.org/firefox/" target="_blank" rel="noopener noreferrer">Firefox is recommended</a>.&nbsp; You can use any browser (Edge, Chrome, Safari, Firefox) updated within the last couple years to view, navigate, and complete the whole course but some of the advanced navigation features can only be used in Firefox.</p>
+<p></p>
+<p><strong>Videoconferencing</strong>: We use <a href="http://zoom.us" target="_blank" rel="noopener noreferrer">Zoom </a>for our videoconference meetings.&nbsp; The meeting link will be emailed to you prior to the meeting.&nbsp; It is recommend that you download and test your camera and microphone on Zoom before attending an instructor meeting.&nbsp; The easiest way to to this is to go to the <a href="https://zoom.us/test" target="_blank" rel="noopener noreferrer">Zoom test page</a>.&nbsp; <em class="note">Note: Zoom's test page will download Zoom for you.</em></p>
+<div>
+  <p></p>
+</div>
+<p><em class="hl">To test your hardware in Zoom</em>, open Zoom and make sure you are on the <em><strong>Home</strong> </em>tab and click the <em><strong>Settings Icon</strong> </em>(right side- <em class="ref" id="r-zoom">fig ##</em>) and the <strong>Settings </strong>Window will open (right side- <em class="ref" id="r-zoom">fig ##</em>).&nbsp; Go to the <em><strong>Audio</strong> </em>and <em><strong>Video</strong> </em>tabs to test your microphone, speakers, and webcam.&nbsp; If you are using a Mac, the view is different but the buttons are the same.</p>
+<p></p>
+<p><img src="../Images/R-00-Zoom.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="zoom">Testing the audio and video in Zoom (click on picture to resize).</h5>
+<h3>Accessing the class</h3>
+<p>You need an MSU ID or an MSU Guest ID to access the class. You can <a href="https://community.idm.msu.edu/" target="_blank" rel="noopener">get an MSU Guest ID here</a>.&nbsp; The Guest ID is the same as the email you used to get it.</p>
+<h2>Class Structure</h2>
+<p>The course has 10 lessons: <strong></strong></p>
+<ol>
+<li><strong>RStudio Projects</strong>: Set up software and the programming environment for the class, go over the programming environment</li>
+<li><strong>Components</strong>: Getting data from a CSV file, scatterplots, breaking down GGPlot instructions, mapping elements</li>
+<li><strong>Plot Styles</strong>: Plot themes, styling components on a plot, labels and title, regression lines</li>
+<li><strong>Date Objects</strong>: Modifying data columns, creating CSV files, line plots, modifying the paneling and background of the plot area</li>
+<li><strong>Histograms</strong>:date formatting, if() and which() statements with multiple conditions, histograms, adding lines, faceting</li>
+<li><strong>Boxplots 1</strong>: quantiles, boxplots, factoring variables, annotating plot, outliers</li>
+<li><strong>Boxplots 2</strong>: ordering variables, grouping boxplots, RGB colors, faceting boxplots, legends</li>
+<li><strong>Barplots</strong>: variables types, filling bars by variable, reordering data frame, legend style changes</li>
+<li><strong>Text Plots</strong>: scatterplot with text, gradients, pattern recognition (grep), legend styling</li>
+<li><strong>Multipanel Plots</strong>: more pattern recognition, subsetting values, conditions on vectors, multiple plots on a canvas</li>
+</ol>
+<h3>Lesson Application</h3>
+<p>Every lesson has an <em><strong>Application</strong> </em>section at the end that will ask you to apply what you learned in the lesson in your own script.&nbsp; The applications are not graded and the answers are provided on the GitHub page for the class.&nbsp; However,<em class="hl"> it is highly recommended that you email your applications to the instructor. </em>Emailing instructions are given in the applications.&nbsp;<em><strong></strong></em></p>
+<h3>Extensions and Traps</h3>
+<p class="">Many of the lessons contain optional content called <em><strong>Extension</strong> </em>and <em><strong>Traps</strong></em>.&nbsp; Extensions contain material that goes beyond the lesson's objectives and Traps capture some of the common issues students have with the lesson's objectives.&nbsp; There are links to <em><strong>Extensions</strong> </em>and <em><strong>Traps</strong> </em>within the Content area of the lesson.&nbsp; Clicking on the appropriate link takes you directly to the <em><strong>Extension</strong> </em>or <em><strong>Trap.</strong></em> <em class="ref" id="r-test"> Extension: testing the extension link</em>.</p>
+<h3>Class Project</h3>
+<p><em class="hl">The only product that will be evaluated is your class project.</em>&nbsp; Your class project is to use the skills taught in this class with your own data.&nbsp; The class project is meant to be an ongoing assignment that you update as you learn the skills taught in the lessons.&nbsp; If you do not have your own data you can find a dataset online -- there are many datasets that are freely available online<a href="https://vincentarelbundock.github.io/Rdatasets/datasets.html" target="_blank" rel="noopener noreferrer"> including hundreds at this website</a>.&nbsp;&nbsp;&nbsp; <a href="https://github.com/QFCatMSU/GGPlot-Class-Material/raw/master/Class%20Project%20Rubric.docx" target="_self" class="download">More information and the rubric for the class project is here</a>.</p>
+<h3>Downloading material for the class</h3>
+<p>All material used in the class is available at this&nbsp;<a href="https://github.com/QFCatMSU/GGPlot-Class-Material" target="_blank" rel="noopener">GitHub page</a> including:</p>
+<ul>
+<li>script and data files used in the lessons</li>
+<li>answers to all the lesson applications</li>
+<li>PDF (offline) versions of all the lessons</li>
+</ul>
+<h2>Student-Instructor Meetings</h2>
+<p>Student-instructor meetings will be done on an as-needed basis and meetings can always be requested by the student.&nbsp; Meetings are done preferably using Zoom so that screens can be shared.</p>
+<ol></ol>
+<h2>Lesson features</h2>
+<p>This sections goes over some of the technological features built into the lessons.</p>
+<h3>Resizing Pictures</h3>
+<p>Most pictures in the course can be resized so that the picture is out of your way when you don't need to view it.&nbsp; Clicking on the picture toggles it between the minimized and maximized states (<em class="ref" id="r-resizeImg">fig ##</em>).</p>
+<p></p>
+<p><img src="../Images/NinhBinh%20(Large).jpg" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="resizeImg">Test picture to toggle (Ninh Bình, Việt Nam)</h5>
+<h3>Figures and references</h3>
+<p>When you click on a figure reference, the caption on the figure will highlight for 2 seconds.&nbsp; If the figure is not on the screen, then the page will scroll to the figure and highlight it.&nbsp; For instance, clicking on <em class="ref" id="r-zoom">fig ##</em> will take you to the Zoom figure near the top of this page.</p>
+<h3>Printing lessons and saving lessons to PDF</h3>
+<p>You can print any lesson or save it as a PDF by clicking on the <em><strong>Printer</strong> icon</em> at the top of every lesson (and this syllabus).&nbsp; This will bring up a print dialog (<em class="ref" id="r-pdf">fig ##</em>) and you can print the lesson to a printer.&nbsp; On most machines, you can also choose a PDF device as a printer -- this will save the lesson as a PDF document.&nbsp;</p>
+<p></p>
+<p>Note: Using your browser's print feature instead on the <em><strong>Print</strong> </em>link will print out the whole webpage instead of just the lesson.</p>
+<h4>Print-to-PDF Software</h4>
+<p>If you are using Windows 7 or 8 you might not have a PDF device and you will need to download <em><strong>Print-to-PDF</strong> </em>software. You can see if you have a PDF device by going to the print options in any program and see if any of the devices have "PDF" in their name (<em class="ref" id="r-pdf">fig ##</em>).&nbsp; If you don't have a PDF device, then I recommend you install&nbsp;<a href="http://www.cutepdf.com/products/cutepdf/writer.asp" target="_blank" rel="noopener noreferrer">CutePDF </a>(direct link to the <a href="http://cutepdf.com/download/CuteWriter.exe" target="_blank" rel="noopener noreferrer">file download</a>).&nbsp; CutePDF is simple print-to-PDF software that does not try to install any extra software on your computer. <em class="ref" id="r-offers">Trap: Bloatware<br></em></p>
+<p></p>
+<p><img src="../Images/R-00-PDFPrinter.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="pdf">This author has two print-to-PDF devices -- the Microsoft Print to PDF, which comes with Windows 10, works fine</h5>
+<h3>Long-click menu</h3>
+<p>If you long-click (hold left-button for about half a second) anywhere on any lesson page (<em class="ref" id="r-ff">fig ##, </em>try it!), you are given options to:</p>
+<ul>
+<li>print the lesson (same as the lesson's <em><strong>Print</strong> </em>link)</li>
+<li>go to the top of the page</li>
+<li>return to the previous position</li>
+<li>maximize all pictures</li>
+<li>minimize all pictures</li>
+<li>edit page (for admins only)</li>
+</ul>
+<p></p>
+<p>In Firefox, the options above are also included in the right-click menu.</p>
+<p></p>
+<p><img src="../Images/R-00-LongClickMenu.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 id="ff">The long-click menu -- this view is from Firefox .</h5>
+<h3>Codeblocks</h3>
+<p>Double-clicking on a codeblock will select all the text in the codeblock and copy it to the clipboard -- you can then paste it into RStudio (or any other text editor).&nbsp;</p>
+<h6># the next two lines should be at the top of all your scripts</h6>
+<h6>rm(list=ls());&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h6>
+<h6>options(show.error.locations = TRUE);</h6>
+<h6></h6>
+<h6># create three variables: d, t, and v</h6>
+<h6># give d and t values and use them to calculate v</h6>
+<h6>d = 100;</h6>
+<h6>t = 20;</h6>
+<h6>v = d/t;</h6>
+<h5 class="" id="fullCode">Double clicking on the codeblock selects all the text and copies it to the clipboard</h5>
+<h2>Personal statement from Charlie</h2>
+<p>The biggest thing that is lost when you move a class from a face-to-face environment to an online environment is the daily interaction between the instructor and the students.&nbsp; These interactions provide invaluable informal feedback for the instructor and, I would argue, are the main tool that an instructor uses to make improvements to their class.&nbsp; It is impossible to replicate this in an online class but I ask that you help me out and make an effort to communicate to me the little things.&nbsp; This could mean technical nags like content not appearing properly or pages loading too slowly, lesson content that is unclear, grammar and spelling issues, or scripts that does not work or work in a way that you do not understand.&nbsp;</p>
+<p></p>
+<p>Thank you for reading and taking this into consideration.&nbsp; In the end, it is the interactions between an instructor and the students that make a class great.&nbsp;</p>
+<p></p>
+<h2>Disclaimers and Loose Ends</h2>
+<h3>Student Responsibilities</h3>
+<ul>
+<li>Students are expected to regularly check the <em><strong>Announcements</strong> </em>section on the home page for the class and the email address associated with their MSU ID/ MSU Community ID for new information regarding the class.</li>
+<li>Students are expected to ask questions if they are having problems with an application or their class project.</li>
+<li>Students are expected to monitor their progress in order to complete the course work on time.</li>
+<li>Students are expected to contact either the instructor or MSU regarding technical issues that are interfering with the class.</li>
+<li>Students are expected to follow the <a href="https://ombud.msu.edu/academic-integrity/student-faq.html" target="_blank" rel="noopener noreferrer">MSU’s academic integrity policy</a>.</li>
+<li>Please notify the instructor regarding issues with the class website and lessons.</li>
+</ul>
+<h3>Academic Integrity (summarized)</h3>
+<p>Written or other work which a student submits in a course, shall be the product of his/her own efforts. Plagiarism, cheating, and all other forms of academic dishonesty are prohibited. Students are expected to adhere to the ethical and professional standards associated with their programs and academistylinks.html">https://www.msu.edu/unit/ombud/honestylinks.html.</a></p>
+<h3>Instructor Responsibilities</h3>
+<ul>
+<li>Instructor will be available for assistance for requested virtual office hours (through Zoom).</li>
+<li>Instructor will respond to emails from students within 1 business day.&nbsp; Potential for delayed responses (e.g., instructor is on vacation) will be posted on the front page of the course.</li>
+<li>Changes to the course will be posted in the <em><strong>Announcements</strong> </em>section of the home page for the class.</li>
+</ul>
+<h3>Attendance</h3>
+<p>You are expected to log in to the class at least once a week. Logging in allows you to stay updated and see new announcements.</p>
+<h3>Participation</h3>
+<p>Please note that not all course lessons are the same length and the later ones tend to involve more work. Our goals with regard to participation/progress are to (a) keep you engaged in the course, (b) enhance the overall learning environment by promoting student-teacher communication, and (c) avoid a last minute time crunch for everyone involved. <em class="hl">We will not be sympathetic or make allowances for your failure on course tasks or deadlines that result from not seeing announcements because you had not accessed the course for an extended period, and had not told us you would be away from the internet.</em></p>
+<h3>ADA Statement</h3>
+<ul>
+<li>MSU provides students with disabilities reasonable accommodations to participate in educational programs, activities, or services. Students with disabilities requiring accommodations to participate in class activities or meet course requirements should contact the instructor as early as possible.</li>
+<li>For students needing accommodations for disabilities, please contact your instructor and The Resource Center for Persons with Disabilities at Michigan State University at 517-353-9642.</li>
+</ul>
+<h2 class="trap" id="offers">Trap: Bloatware</h2>
+<p>Adobe Acrobat, like most free software you download, attempts to bundle itself with software you most likely do not need nor want (i.e., bloatware).&nbsp; Make sure you take some time to read the optional offers whenever you download software. This author would argue that the main reason computers "slow" down over time is because of extra software that users unwittingly install.</p>
+<p></p>
+<p><img src="../Images/R-00-Bloatware.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Three offers from Adobe that you neither need nor want -- this author recommends you uncheck them all.</h5>
+<h2 class="extension" id="test">Extension: Testing the extension link.</h2>
+<p>Hi, and welcome to the test <em><strong>Extension</strong></em>.&nbsp; If you clicked on the <em><strong>Extension</strong> </em>link to get here then you can return to your previous location by long-clicking on this page and choosing <em><strong>Go to Previous Location</strong></em>.</p>
+<p></p>
+<p>If you just scrolled down to this point then, congratulations, you have reached the end of the document.</p>
+<p></p>
+</body></html>

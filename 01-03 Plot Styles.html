@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head>
+	<title></title>
+	<meta charset="UTF-8">
+	<script type="text/javascript"> document.write('<'+'!--'); </script>
+       <link rel="stylesheet" type="text/css" href="/content/DEVELOPMENT/2018/courses/DEV-belinsky-2018-BackendTest/Programming/Release/editor.css">
+    <!-- -->
+	<script>
+const D2LMathML="";
+		var scriptFile = document.createElement('script');
+		scriptFile.src = "https://cdn.jsdelivr.net/gh/QFCatMSU/OnlineClassBackEnd/module.js";
+		document.getElementsByTagName('head')[0].appendChild(scriptFile);
+	</script>
+</head>
+
+<body>
+<p class="previousLesson">Components</p>
+<p class="nextLesson">Date objects and canvas styles</p>
+<h1 class="title" id="title">01-03: Plot Styles</h1>
+<h2>Purpose</h2>
+<ul>
+<li>Create a scatterplot with continuous values</li>
+<li>Changing styles on points, lines, and text</li>
+<li>Adding a regression line</li>
+<li>Adding titles and labels</li>
+</ul>
+<h2>Getting data from a CSV file</h2>
+<p>For this lesson, we will be using weather data obtained from NOAA/NCDC for Lansing, Michigan in 2016.&nbsp; <a href="https://cdn.jsdelivr.net/gh/QFCatMSU/GGPlot-Class-Material/data/LansingNOAA2016.csv" target="_self" class="download">You can download the csv file here</a>.&nbsp; Save the file, <em><strong>LansingNOAA2016.csv</strong></em>, to the <em><strong>data</strong> </em>folder in your Root Folder.</p>
+<h3>Start new script in the project and include the data</h3>
+<p>Open the RStudio Project you have been using the last couple of lessons.</p>
+<p></p>
+<p>Add a new script file to your project:</p>
+<ol>
+<li>click <em><strong>File</strong> </em>-&gt;<em><strong> New File</strong></em> -&gt; <em><strong>R Script</strong></em></li>
+<li>save the new blank script file as <em><strong>lesson03.r</strong> </em>inside the <em><strong>scripts</strong> </em>folder</li>
+</ol>
+<p></p>
+<p>The first two lines in the script file includes:</p>
+<ol>
+<li>reading in the <em><strong>reference.r</strong></em> script (like last lesson)</li>
+<li>saving the data from <em><strong>LansingNOAA2016.csv</strong></em> to a dataframe variable called <em><strong>weatherData </strong></em></li>
+</ol>
+<p><em><strong></strong></em></p>
+<h6>source(file="scripts/reference.R");&nbsp;&nbsp; # include the reference.r file<br>weatherData = read.csv(file="data/LansingNOAA2016.csv",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">stringsAsFactors = FALSE</em>);</h6>
+<p></p>
+<p>In <em><strong>read.csv()</strong></em>, the default value for <em><strong>stringsAsFactors</strong> </em>is <strong>TRUE*</strong>.&nbsp; This means that R treats columns in a data frame that contain any non-numeric values as categorical (i.e., a factor).&nbsp; This instructor believes that this behavior is too aggressive and makes it harder in RStudio to view the values in a columns.&nbsp; So,&nbsp; I almost always set <em><strong>s</strong><strong>tringsAsFactors </strong></em>to <strong></strong><em><strong>FALSE</strong></em>.&nbsp; If needed, we can later convert a column's values to factors, which we do in later lessons.</p>
+<p></p>
+<p>When we execute the script with the two lines, the data from the CSV file is saved to the data frame, <em><strong>weatherData.</strong>&nbsp; <strong>weatherData</strong> </em>appears in the Environment Window and double-clicking on it opens it up in the Main Window (<em class="ref" id="r-viewdataframe">fig ##</em>).</p>
+<p></p>
+<p><img src="../Images/GGP-01-03-DataFrame.PNG" alt="" class="fs"></p>
+<h5 class="" id="viewdataframe">Viewing the data frame in RStudio</h5>
+<p></p>
+<p class="note">* Starting with R version 4.0 (released March 2020), the default value for <strong>stringAsFactor</strong> is <strong>FALSE</strong></p>
+<h2>Plot Temperature vs Humidity (continuous x-axis)</h2>
+<p>Like last lesson we will</p>
+<p></p>
+<ul>
+<li>Make a call to initialize a GGPlot canvas, using <em><strong>ggplot()</strong></em> with the <em><strong>weatherData</strong> </em>data frame:</li>
+</ul>
+<h6 class="nn">ggplot(data=weatherData)</h6>
+<p></p>
+<ul>
+<li>Add a scatterplot component, <em><strong>geom_point(),</strong></em> that uses the <em><strong>mapping</strong> </em>subcomponent to describe how the data gets represented in the plot: <em><strong>relHum</strong> (y-axis) </em>vs <em><strong>avgTemp </strong></em>(x-axis):</li>
+</ul>
+<h6 class="nn">geom_point( mapping=aes(x=avgTemp, y=relHum) )</h6>
+<p><br><em><strong></strong></em></p>
+<ul>
+<li>Save the ggplot canvas information to a variable, <em><strong>plotData</strong></em>, and use <em><strong>plot()</strong></em> to display the canvas:</li>
+</ul>
+<h6><em class="hl">plotData </em><em class="nn">= ggplot( data=weatherData ) +</em></h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="">geom_point( mapping=aes(x=avgTemp, y=relHum) );</em></h6>
+<h6><em class="hl">plot(plotData);</em></h6>
+<p></p>
+<p>Putting all the code together:<em class="hl"></em></p>
+<h6>source(file="scripts/reference.R");&nbsp;&nbsp; # include the reference.r file<br>weatherData = read.csv(file="data/LansingNOAA2016.csv",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stringsAsFactors = FALSE);</h6>
+<h6></h6>
+<h6>#### Part 1: Plot humidity vs temperature ####</h6>
+<h6>plotData = ggplot( data=weatherData ) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point( mapping=aes(x=avgTemp, y=relHum) );</h6>
+<h6>plot(plotData);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-03-Scatterplot.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Scatterplot of humidity vs temperature</h5>
+<h3>Resetting the theme</h3>
+<p>I am not a big fan of GGPlot's default grey canvas theme, but the theme can be easily changed.&nbsp; In this case, I will change to a more standard black and white theme (<em class="ref" id="r-bwtheme">fig ##</em>) using the GGPlot component <em><strong>theme_bw()</strong></em><em>, </em><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" target="_blank" rel="noopener">which is one of many themes</a> that can be applied to the plot.</p>
+<p></p>
+<h6>#### Part 2: Change to a black and white theme ####</h6>
+<h6>plotData = ggplot( data=weatherData ) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point( mapping=aes(x=avgTemp, y=relHum) ) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">theme_bw()</em>;&nbsp;&nbsp;&nbsp;&nbsp; # changes the theme of the whole canvas<br>plot(plotData);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-03-BlackWhite.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="bwtheme">Using the black-white theme in ggplot</h5>
+<h2>Styling the points</h2>
+<p>Pretty much everything in a GGPlot canvas can be styled.&nbsp; We are going to start by styling the points in the <em><strong>geom_point()</strong></em> component using the subcomponents: <em><strong>color</strong></em>, <em><strong>size</strong></em>, and <em><strong>shape</strong></em>.</p>
+<p></p>
+<p>The possible values for these subcomponents are:</p>
+<ul>
+<li><em><strong>color</strong></em>: pretty much any color name you can think of can be used -- <a href="https://www.google.com/url?sa=t&amp;rct=j&amp;q=&amp;esrc=s&amp;source=web&amp;cd=1&amp;cad=rja&amp;uact=8&amp;ved=0ahUKEwj8yoeIz9_ZAhVGHqwKHc-_B3EQFggpMAA&amp;url=http%3a%2f%2fwww.stat.columbia.edu%2f%7etzheng%2ffiles%2fRcolor.pdf&amp;usg=AOvVaw1XIn-mwZ73RgG8bxh4Lan4" target="_blank" rel="noopener noreferrer">here is a complete list of all the color names</a>.&nbsp;</li>
+<li><em><strong>size</strong></em>: a number that acts as a multiplier -- so <em><strong>size=3</strong></em> is 3 times the original size, <em><strong>size=0.5</strong></em> is half the original size</li>
+<li><em><strong>shape</strong></em>: there are three options for shape</li>
+<ul>
+<li><a href="http://www.sthda.com/english/wiki/r-plot-pch-symbols-the-different-point-shapes-available-in-r" target="_blank" rel="noopener noreferrer">the standard R shapes</a> (numbered 0 through 25)</li>
+<li>any character on the keyboard in quotes (so,<em><strong> shape = "~"</strong></em> would use the tilde as a point character) &nbsp;&nbsp;</li>
+<li>any <a href="https://en.wikipedia.org/wiki/List_of_Unicode_characters" target="_blank" rel="noopener">Unicode </a>character (Unicode U+018F would be: <strong>shape = "\u018f"</strong>)</li>
+</ul>
+</ul>
+<p></p>
+<h6>#### Part 3: Styling the points ####</h6>
+<h6>plotData = ggplot( data=weatherData ) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point( mapping=aes(x=avgTemp, y=relHum)<em class="hl">,</em> <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">color="darkgreen", </em></h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">size=2.5, </em></h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">shape=17</em> ) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw();</h6>
+<h6>plot(plotData);</h6>
+<p></p>
+<p>In this example, we set four subcomponents in <em><strong>geom_point()</strong></em>:</p>
+<ul>
+<li><em><strong>mapping</strong></em>: maps the column data <strong></strong><em><strong>relHum</strong></em> vs<strong></strong><em><strong> avgTemp</strong></em> to the plot<strong></strong><em><strong><br></strong></em></li>
+<li><em><strong>color</strong></em>: changed the point color to <strong>darkgreen</strong></li>
+<li><em><strong>size</strong></em>: multiplied the point size by<strong> 2.5</strong></li>
+<li><em><strong>shape</strong></em>: changed the point shape to filled triangles (<strong>17</strong>)</li>
+</ul>
+<p></p>
+<p><img src="../Images/GGP-01-03-StylingPoints.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Styling the points on a plot</h5>
+<p></p>
+<p>If you want even more options for <em><strong>color</strong> </em>and <em><strong>shape</strong></em>, then look at <em class="ref" id="r-hex-unicode">Extension: rgb colors and Unicode characters</em></p>
+<h3>Adding transparency (opacity) to the point</h3>
+<p>When you have a lot of points overlapping each-other, it is often helpful to make the points partially transparent so you can better see the clustering of points.&nbsp; To do this we change the <em><strong>alpha</strong> </em>subcomponent -- <em><strong>alpha</strong> </em>is a value between <strong>0</strong> (completely transparent) and <strong>1</strong> (completely opaque).&nbsp;</p>
+<p></p>
+<p><em><strong>alpha</strong> </em>is also a subcomponent in the <em><strong>geom_point()</strong> </em>component.&nbsp; For this example, we use an <em><strong>alpha</strong> </em>of <strong>0.4</strong> (i.e., 40% opaque):</p>
+<p></p>
+<h6>#### Part 4: Make points semi-transparent ####</h6>
+<h6>plotData = ggplot( data=weatherData ) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point( mapping=aes(x=avgTemp, y=relHum)<em class="">,</em> <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="darkgreen",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size=2.5,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; shape=17,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em class="hl"> alpha = 0.4</em> ) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw();</h6>
+<h6>plot(plotData);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-03-Alpha.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Adding an alpha value (transparency) to the points to better see clustering</h5>
+<h2>Labels and Titles</h2>
+<p>We can add labels to the axes and a title to the plot using the <em><strong>labs() </strong></em>component<strong></strong><em>.</em>&nbsp;</p>
+<p></p>
+<p>The subcomponents in the <em><strong>labs()</strong></em> component that we will modify are:</p>
+<ul>
+<li><em><strong>title</strong></em>: title of plot</li>
+<li><em><strong>subtitle</strong></em>: subtitle of plot</li>
+<li><em><strong>x</strong></em>: x-axis label</li>
+<li><em><strong>y</strong></em>: y-axis label</li>
+</ul>
+<p></p>
+<h6>#### Part 5: Add labels and titles ####</h6>
+<h6>plotData = ggplot( data=weatherData ) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point( mapping=aes(x=avgTemp, y=relHum)<em>,</em> <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="darkgreen",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size=2.5,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; shape=17,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; alpha = 0.4 ) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">labs</em>(<em class="hl">title</em> = "Humidity vs. Temperature",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">subtitle</em> = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">x</em> = "Temperature (F)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">y</em> = "Humidity (%)");</h6>
+<h6>plot(plotData);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-03-Labels.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Adding labels and titles to a plot</h5>
+<p></p>
+<p><em class="note">Note: In a previous lesson, we used the component <strong>ggtitle()</strong> to change the title on the plot -- in this lesson we use<strong> labs()</strong></em><strong></strong><em class="note">. In GGPlot, there are often multiple ways to perform the same task.</em></p>
+<h3>Styling text labels</h3>
+<p>We can change the default font styles using the <em><strong>theme()</strong></em> component.&nbsp; <em><strong>theme()</strong></em> is probably the most commonly used component and can be used to modify pretty much every element in the ggplot canvas -- and there are <a href="http://ggplot2.tidyverse.org/reference/theme.html" target="_blank" rel="noopener noreferrer">many elements than can be modified.</a>&nbsp;</p>
+<p></p>
+<p>We are going to look at many of the subcomponents in <em><strong>theme()</strong></em> in later lessons, for now we are just going to look at these four:</p>
+<ul>
+<li><em><strong>axis.title.x</strong></em>: x-axis label style</li>
+<li><em><strong>axis.title.y</strong></em>: y-axis label style</li>
+<li><em><strong>plot.title</strong></em>: plot title style</li>
+<li><em><strong>plot.subtitle</strong></em>: plot subtitle style</li>
+</ul>
+<p></p>
+<p>And for the above elements, we will modify the:</p>
+<ul>
+<li><em><strong>size</strong></em>: font size in pixels</li>
+<li><em><strong>color</strong></em>: font color</li>
+<li><em><strong>face</strong></em>: font modification (bold, italic, bold.italic)</li>
+<li><em><strong>family</strong></em>: font type (this should be used with caution!)</li>
+</ul>
+<p></p>
+<h6>#### Part 6: Styling the labels ####</h6>
+<h6>plotData = ggplot( data=weatherData ) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point( mapping=aes(x=avgTemp, y=relHum)<em>,</em> <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="darkgreen",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size=2.5,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; shape=17,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; alpha = 0.4 ) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Humidity vs. Temperature",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Temperature (F)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Humidity (%)") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">theme</em>(<em class="hl">axis.title.x</em>=element_text(<em class="hl">size</em>=14, <em class="hl">color</em>="orangered2"),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">axis.title.y</em>=element_text(size=14, color="orangered4"), <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em class="hl"> plot.title</em>=element_text(size=18, <em class="hl">face</em>="bold", <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color ="darkblue"),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">plot.subtitle</em>=element_text(size=10, face="bold.italic", <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color ="brown", <em class="hl">family</em>="serif"));</h6>
+<h6>plot(plotData);</h6>
+<p></p>
+<p class="ref" id="r-theme">Trap: Changing theme after using a theme component</p>
+<p></p>
+<p><img src="../Images/GGP-01-03-LabelStyles.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="themes">Styling labels and titles</h5>
+<h3>Elements of a plot</h3>
+<p>Let's look a little deeper at how subcomponents within <em><strong>theme()</strong> </em>are set...</p>
+<p></p>
+<p>In the following code, the <em><strong>size</strong> </em>of <em><strong>axis.title.x</strong></em>, is set to <strong>14</strong> and the <em><strong>color</strong> of<strong> axis.title.x </strong></em>is set to <em><strong>orangered2</strong></em>:</p>
+<h6 class="nn">axis.title.x = element_text(size=14, color="orangered2")</h6>
+<p></p>
+<p>This is probably not an intuitive way to set styles.&nbsp; In GGPlot, <em><strong>axis.title.x</strong></em> is a text element (or <em><strong>element_text</strong></em>). Instead of directly setting the <em><strong>size</strong> </em>and <em><strong>color</strong> </em>of <em><strong>axis.title.x</strong></em>, you set <em><strong>axis.title.x</strong></em> to a text element (<em><strong>element_text</strong></em>) that has the <em><strong>size</strong> </em>and <em><strong>color</strong> </em>you want -- in this case, <em><strong>14</strong></em> and <em><strong>orangered2</strong></em>.<strong></strong></p>
+<p></p>
+<p>In <em class="ref" id="r-themes">figure ##</em>, we are modifying four subcomponents that are text element, so they are all set to an <strong>element_text</strong> that has the styles we want.&nbsp; In future lessons we will look at other types of elements.</p>
+<h2>Add Regression line</h2>
+<p>Next, we will add a regression line to the canvas.&nbsp; This is done using the plotting component <em><strong>geom_smooth()</strong></em>.&nbsp;</p>
+<p></p>
+<p>Since <em><strong>geom_smooth()</strong></em> adds data to the plot area, we need to use the <em><strong>mapping</strong> </em>subcomponent to tell<em><strong> GGPlot</strong></em> what is being added to the plot area and how. In this case we are mapping <em><strong>relHum</strong> </em>vs. <em><strong>avgTemp</strong></em>.</p>
+<p></p>
+<p>We also add the <em><strong>method</strong> </em>subcomponent to <em><strong>geom_smooth()</strong></em> to set the smoothing method we will use on the data.&nbsp; In this case, linear model (<em><strong>lm</strong></em>).</p>
+<p><em><strong></strong></em></p>
+<h6>#### Part 7: Add regression line ####</h6>
+<h6>plotData = ggplot( data=weatherData ) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point( mapping=aes(x=avgTemp, y=relHum)<em>,</em> <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="darkgreen",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size=2.5,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; shape=17,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; alpha = 0.4 ) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Humidity vs. Temperature",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Temperature (F)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Humidity (%)") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme(axis.title.x=element_text(size=14, color="orangered2"),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; axis.title.y=element_text(size=14, color="orangered4"), <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; plot.title=element_text(size=18, face="bold", <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color ="darkblue"),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; plot.subtitle=element_text(size=10, face="bold.italic", <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color ="brown", family="serif")) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">geom_smooth( mapping=aes(x=avgTemp, y=relHum), </em></h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">method="lm" )</em>;</h6>
+<h6>plot(plotData);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-03-Regression.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Adding a regression line</h5>
+<h2>Styling the line</h2>
+<p>Lastly, we can also apply styles to the regression line using subcomponents in <em><strong>geom_smooth()</strong></em>.&nbsp;</p>
+<p></p>
+<p>The four subcomponents of the regression line we will change are:</p>
+<ul>
+<li><em><strong>color</strong></em>: the color of the line</li>
+<li><em><strong>linetype</strong></em>: a number from 1 to 6 that gives the type of line -- <a href="http://www.sthda.com/english/wiki/line-types-in-r-lty" target="_blank" rel="noopener noreferrer">the line types are shown here</a></li>
+<li><em><strong>size</strong></em>: multiplier for the size of the line</li>
+<li><em><strong>fill</strong></em>: color of the area representing the error-range of the regression line</li>
+</ul>
+<p></p>
+<h6>source(file="scripts/reference.R");&nbsp;&nbsp; # include the reference.r file<br>weatherData = read.csv(file="data/LansingNOAA2016.csv",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stringsAsFactors = FALSE);<br><br></h6>
+<h6>plotData = ggplot( data=weatherData ) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point( mapping=aes(x=avgTemp, y=relHum)<em>,</em> <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="darkgreen", size=2.5, shape=17,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; alpha = 0.4 ) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Humidity vs. Temperature",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Temperature (F)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Humidity (%)") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme(axis.title.x=element_text(size=14, color="orangered2"),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; axis.title.y=element_text(size=14, color="orangered4"), <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; plot.title=element_text(size=18, face="bold", <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color ="darkblue"),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; plot.subtitle=element_text(size=10, face="bold.italic", <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color ="brown", family="serif")) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_smooth(mapping=aes(x=avgTemp, y=relHum),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; method="lm",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">color="red", </em></h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">size=0.8, </em></h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">linetype=4, </em></h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">fill="lightblue")</em>;</h6>
+<h6>plot(plotData);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-03-LineStyles.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Adding styles to the regression line</h5>
+<h2>Application</h2>
+<p>Create a script file in your Project's script <em><strong>folder </strong></em>called <em><strong>app03.r</strong></em> and, using the data from <strong>LansingNOAA2016.csv:</strong></p>
+<p><strong></strong></p>
+<ol>
+<li>Create a scatterplot of Average Wind Speed (<em><strong>windSpeed</strong></em>) vs. Daily Temperature Departure (<em><strong>tempDept</strong></em>)
+<ul>
+<li class="note">Note: <em><strong>tempDept</strong> </em>is how much the average temperature changed between two consecutive days, a high positive or negative <em><strong>tempDept</strong> </em>value indicates that a major weather system likely went through the area.</li>
+</ul>
+</li>
+<li>Make the following modifications to the points:
+<ol>
+<li>set the <strong>alpha</strong> of the points to 70% opaque</li>
+<li>set the <strong>size</strong> of the point to twice the normal size</li>
+<li>change the <strong>color</strong> of the points to <strong>rgb(red=0, green=.6, blue=.6)</strong></li>
+<li>use filled-diamonds as the point <strong>shape</strong></li>
+</ol>
+</li>
+<li>Add a regression line (<em><strong>windSpeed</strong> </em>vs <em><strong>tempDept</strong></em>) to the plot</li>
+<li>Change the line-type, color, and fill of the regression line.</li>
+<li>Change the angle the values on the y-axis are drawn at <br>
+<ul>
+<li>for help, see the last lesson where this was done on the x-axis</li>
+</ul>
+</li>
+<li>Add a <strong>title</strong> and <strong>subtitle</strong> and change the x and y-axis labels</li>
+<li>Change the subtitle's <strong>color</strong> and <strong>size</strong></li>
+<li>Change the x-axis labels font <strong>face</strong> and <strong>color</strong></li>
+<li>Put a comment in the script file about the what the scatterplot shows</li>
+<li><em><strong>tempDept</strong> </em>can be positive or negative but we might only care about the absolute change -- not the direction of change. So make all <em><strong>tempDept</strong> </em>values positive by using the absolute function: <em><strong>abs(tempDept)</strong></em> in both the scatterplot and the regression line.<em><strong></strong></em></li>
+</ol>
+<h3>Questions</h3>
+<ol>
+<li>What was your level of comfort with the lesson/application?</li>
+<li>What areas of the lesson/application confused or still confuses you?</li>
+<li>What are some things you would like to learn related to, but not covered in, this lesson?</li>
+</ol>
+<h2 class="extension" id="hex-unicode">Extension: RGB Colors and Unicode Characters</h2>
+<p>There are many more colors than names of colors and there are many more character than keys on a keyboard.&nbsp; This section will give a brief introduction on how one accesses the full spectrum of colors and characters.</p>
+<h3>RGB colors</h3>
+<p>The are over 16 million colors we can choose from and to access all these colors, we need to use their <em><strong>rgb</strong> </em>color codes.</p>
+<p></p>
+<p><em><strong>rgb</strong> </em>stands for red, green, blue and represents the three <em class="hl">primary light colors</em>.&nbsp; This is not the same as the primary pigment colors that you are probably familiar with (red, yellow, blue -- or, more accurately: magenta, yellow, cyan).&nbsp; The different is that <em class="hl">primary light colors are additive</em> (they combine to make white), whereas the <em class="hl">primary pigment colors are subtractive</em> (they combine to make black -- or a really dark brown).</p>
+<p></p>
+<p>In R, you can set color to an <em><strong>rgb</strong> </em>value using <em><strong>rgb()</strong></em>.&nbsp; <em><strong>rgb()</strong></em> has three parameter (<strong>red</strong>, <strong>green</strong>, <strong>blue</strong>), and each color is set to a value from<strong> 0</strong> (completely off) to <strong>1</strong> (completely on).</p>
+<p></p>
+<p>So:</p>
+<p>black is: rgb(red=0, green=0, blue=0)</p>
+<p>white is: rgb(red=1, green=1, blue=1)</p>
+<p>bright blue is: rgb(red=0, green=0, blue=1)</p>
+<p>dark blue is: rgb(red=0, green=0, blue=0.3)</p>
+<p>yellow is: rgb(red=1, green=1, blue=0)</p>
+<p>dark grey is: rgb(red=.3, green=.3, blue=.3)</p>
+<p></p>
+<p>It takes some time to get used to mixing light colors, but it is worth it in the end to learn how to do it.</p>
+<h3>Unicode Characters</h3>
+<p><a href="https://en.wikipedia.org/wiki/List_of_Unicode_characters" target="_blank" rel="noopener">Unicode characters</a> represent the most complete digital set of characters used in the world and, like hexadecimal colors, are represented by a number.&nbsp; You use Unicode to get characters that you cannot find on your keyboard.&nbsp; Wikipedia says that there are currently over 136,000 characters, and this number is growing.&nbsp;</p>
+<p></p>
+<p>In R, Unicode character are preceded by a dash (<em><strong>-</strong></em>) and follow by the number representing the character code.</p>
+<h3>Script using RGB colors and Unicode characters</h3>
+<p>In the following script, I used <strong>RGB</strong> colors to set the color of the points, and <strong>Unicode</strong> to represent the shape of the points.</p>
+<ul>
+<li>The color <em><strong>rgb(red=0.8, green=0.4, blue=0)</strong></em> is most red light, a little green light, and no blue light.&nbsp; It is orange-red (remember these are light color, not pigment colors)</li>
+<li>The shape is Unicode character <strong>6235</strong>, which is the Mongolian letter <em>toda nia</em>:<span style="font-size: 18pt;">&nbsp;ᡛ</span></li>
+</ul>
+<h6>source("scripts/reference.R");&nbsp;&nbsp;&nbsp;&nbsp; # include the script file reference.r</h6>
+<h6><br>weatherData = read.csv(file="data/LansingNOAA2016.csv",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stringsAsFactors = FALSE);</h6>
+<h6></h6>
+<h6>plotData = ggplot(data=weatherData) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point(mapping=aes(x=avgTemp, y=relHum), <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">color=rgb(red=0.8, green=0.4, blue=0)</em>,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size=2.5,</h6>
+<h6><em class="hl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; shape=-6235</em> ) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw();</h6>
+<h6>plot(plotData);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-03-HexAndUnicode.PNG" alt="" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Using hexadecimal color codes and Unicode</h5>
+<p></p>
+<h2 class="trap" id="theme">Trap: Changing a theme after modifying</h2>
+<p>Is this example, <em><strong>theme()</strong></em> is used to modify various label and title components, but then <em><strong>theme_bw()</strong></em> is called.&nbsp; <em><strong>theme_bw()</strong></em> reset all components of the theme basically undoing the changes we made beforehand.&nbsp;&nbsp; Make sure<em><strong> theme_bw()</strong></em> is called before other theme changes are made.</p>
+<p></p>
+<h6>source("scripts/reference.R");&nbsp;&nbsp; # include the script file reference.r</h6>
+<h6><br>weatherData = read.csv(file="data/LansingNOAA2016.csv",</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stringsAsFactors = FALSE);</h6>
+<h6>plotData = ggplot(data=weatherData) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point(mapping=aes(x=avgTemp, y=relHum)<em>,</em> <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="darkgreen", size=2.5, shape=17,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; alpha = 0.4 ) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Humidity vs. Temperature",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Temperature (F)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Humidity (%)") +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">theme</em>(axis.title.x=element_text(size=14, color="orangered2"),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; axis.title.y=element_text(size=14, color="orangered4"), <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; plot.title=element_text(size=18, face="bold", <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color ="darkblue"),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; plot.subtitle=element_text(size=10, face="bold.italic", <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color ="brown", family="serif")) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em class="hl"> theme_bw()</em>;</h6>
+<h6>plot(plotData);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-03-ResettingTheme.PNG" alt="" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5><strong>theme_bw()</strong> resets theme undoing the changes made in the <strong>theme() </strong>component above.<em><br></em></h5>
+<p>
+<script type="text/javascript">document.oncontextmenu=null;document.onselectstart=null;document.ondragstart=null;document.onmousedown=null;document.body.oncontextmenu=null;document.body.onselectstart=null;document.body.ondragstart=null;document.body.onmousedown=null;document.body.oncut=null;document.body.oncopy=null;document.body.onpaste=null;</script>
+</p>
+</body></html>

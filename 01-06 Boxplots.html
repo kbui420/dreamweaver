@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head>
+	<title></title>
+	<meta charset="UTF-8">
+	 <script type="text/javascript"> document.write('<'+'!--'); </script>
+       <link rel="stylesheet" type="text/css" href="/content/DEVELOPMENT/2018/courses/DEV-belinsky-2018-BackendTest/Programming/Release/editor.css">
+    <!-- -->
+	<script>
+const D2LMathML="";
+		var scriptFile = document.createElement('script');
+		scriptFile.src = "https://cdn.jsdelivr.net/gh/QFCatMSU/OnlineClassBackEnd/module.js";
+		document.getElementsByTagName('head')[0].appendChild(scriptFile);
+	</script>
+</head>
+
+<body>
+<p class="previousLesson">Histograms</p>
+<p class="nextLesson">Boxplots 2</p>
+<h1 class="title" id="title">01-06: Boxplots 1</h1>
+<h2>Purpose</h2>
+<ul>
+<li>Order boxplots by factor</li>
+<li>add text to a plot area</li>
+<li>find, and use, quantile values&nbsp;</li>
+<li>put error bars on boxplot</li>
+</ul>
+<h2>Concepts</h2>
+<h2>Get data</h2>
+<p class="download">For this lesson, we will work from the data file we create in the last lesson: <a href="https://cdn.jsdelivr.net/gh/QFCatMSU/GGPlot-Class-Material/data/LansingNOAA2016-2.csv" target="_self" class="download">LansingNOAA2016-2.csv</a>.</p>
+<h6>source( file="scripts/reference.R" ); <br>weatherData = read.csv( file="data/LansingNOAA2016-2.csv", <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stringsAsFactors = FALSE );</h6>
+<h2 id="dataframe">Creating three new columns</h2>
+<p>We are going to create, and then use, three new columns in <em><strong>weatherData</strong></em>:</p>
+<ul>
+<li>Wind Speed (values: high, medium, low)</li>
+<li>Wind Direction (values: north, south, west, east)</li>
+<li>Change in Temperature (a numeric value giving the difference between high temperatures for consecutive days)</li>
+</ul>
+<h3>Wind speed</h3>
+<p>The column <em><strong>windSpeed</strong> </em>gives the wind speed in <strong>miles/hour</strong> for each day.&nbsp; We will categorize these wind speed values as <strong>high,</strong> <strong>medium</strong>, and <strong>low</strong> winds, where:</p>
+<ul>
+<li><strong>low</strong>: bottom 30% (0-0.3 quantile) of wind speed values</li>
+<li><strong>medium</strong>: 30%-70% (0.3-0.7 quantile) of wind speed values</li>
+<li><strong>high</strong>: top 30% (0.7-1.0 quantile) of wind speed values</li>
+</ul>
+<p></p>
+<p>To do this we need to know what the <strong>30th</strong> (0.3) and <strong>70th</strong> (0.7) percentile (quantile) values for <em><strong>windSpeed</strong> </em>are.&nbsp;</p>
+<h4>Finding percentiles (quantiles)</h4>
+<p>We can find percentile values using <em><strong>quantile():</strong></em></p>
+<p><em><strong></strong></em></p>
+<p>In <em><strong>quantiles()</strong></em>, we pass in the vector we want to check (<em><strong>windSpeed</strong></em>) and a vector, called <em><strong>probs</strong></em>, that gives the quantile values we want to find.</p>
+<h6 class="nn">windSpeedQuant = quantile(weatherData$windSpeed, probs=c(.30, .70));</h6>
+<p></p>
+<p>The above code says that the <strong>0.30</strong> and <strong>0.70</strong> quantile values will be found in <em><strong>windSpeed</strong> </em>and these two values will be saved to the variable <em><strong>windSpeedQuant.&nbsp; </strong></em>The <strong>0.30</strong> and <strong>0.70</strong> quantile values are <strong>6.2</strong> and <strong>10.4</strong> as shown in <em class="ref" id="r-quantiles">fig ##</em>.</p>
+<p></p>
+<p><img src="../Images/GGP-01-06-Quants.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="quantiles">The 0.30 and 0.70 quantile values for wind speed</h5>
+<h4>Categorizing using quantiles</h4>
+<p>So, <em><strong>windSpeedQuant[1]</strong></em> = <strong>6.4</strong> and <em><strong>windSpeedQuant[2]</strong></em> = <strong>10.2</strong>. Now, we can compare all <strong>366</strong> values in <em><strong>windSpeed </strong></em>to the quantile values and place the wind speed values in a category: <strong>low</strong>, <strong>medium</strong>, or <strong>high</strong>.</p>
+<p></p>
+<p>First, we use a <em><strong>for()</strong></em> to go through all rows of <em><strong>weatherData</strong>. &nbsp;</em>The number of rows is given by <em><strong>nrow()</strong></em></p>
+<h6 class="nn">for(day in 1:nrow(weatherData))&nbsp; # nrow(weatherData) = 366</h6>
+<p class="note">Note: we could have used <em><strong>for(i in 1:366)</strong></em> but using <em><strong>nrow(weatherData)</strong></em> makes the code more scalable (i.e., it will still work if the number of rows, or days, changes)</p>
+<p></p>
+<p>Inside the <em><strong>for()</strong></em>, we will use an <em><strong>if-else</strong></em> structure to compare each <em><strong>windSpeed</strong> </em>values to the quantile values in <em><strong>windSpeedQuant</strong></em> and, accordingly, set the values in our new column, <em><strong>windSpeedLevel, </strong></em>to low, medium, or high.</p>
+<h6 class="p">for(day in 1:nrow(weatherData))&nbsp; # nrow(weatherData) = 366</h6>
+<h6>{</h6>
+<h6 class="p">&nbsp; # if the value in windSpeed is less than or equal to the low quant value</h6>
+<h6 class="p">&nbsp; if(weatherData$windSpeed[day] &lt;= windSpeedQuant[1])&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # &lt;= 6.4<br>&nbsp; {<br>&nbsp; &nbsp; weatherData$windSpeedLevel[day] = "Low";<br>&nbsp; }</h6>
+<h6 class="p">&nbsp; # if the value in windSpeed is greater than or equal to the high quant value</h6>
+<h6 class="p">&nbsp; else if(weatherData$windSpeed[day] &gt;= windSpeedQuant[2]) # &gt;= 10.2<br>&nbsp; {<br>&nbsp; &nbsp; weatherData$windSpeedLevel[day] = "High";<br>&nbsp; }<br>&nbsp; else # the value in windSpeed is between 6.2 and 10.4<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; weatherData$windSpeedLevel[day] = "Medium";<br>&nbsp; }</h6>
+<h6>}</h6>
+<p></p>
+<p><img src="../Images/GGP-01-06-WindSpeedLevels.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="quants">Creating a wind speed level column using quantiles</h5>
+<p></p>
+<p>The new column, <em><strong>windSpeedLevel</strong></em>, is shown in <em class="ref" id="r-newCols">fig ##</em>.</p>
+<h3>Wind direction</h3>
+<p>The column in <em><strong>weatherData</strong> </em>called <em><strong>windSusDir</strong></em> gives the direction that the most sustained wind came from for the day.&nbsp; The direction is in degrees from <strong>0</strong> to <strong>360</strong> with <strong>0</strong> being due north and <strong>180</strong> being due south.&nbsp;</p>
+<p></p>
+<p>We are going to convert the degrees to the closest cardinal direction (Fig <em class="ref" id="r-compass">##</em>) and save the value to the column <em><strong>windDir</strong></em>:</p>
+<ul>
+<li><strong>North</strong> is from <strong>315</strong> degrees to <strong>45</strong> degrees (true north is<strong> 0</strong> degrees)</li>
+<li><strong>East</strong> is from <strong>45</strong> degrees to <strong>135</strong> degrees (true East is <strong>90</strong> degrees)</li>
+<li><strong>South</strong> is from <strong>135</strong> degrees to <strong>225&nbsp;</strong> degrees (true South is <strong>180</strong> degrees)</li>
+<li><strong>West</strong> is from <strong>225</strong> degrees to <strong>315</strong> degrees (true West is <strong>270</strong> degrees)</li>
+</ul>
+<p></p>
+<p><img src="../Images/GGP-01-07%20Compass.png" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="compass">Compass angles and cardinal directions</h5>
+<p></p>
+<p>Similar to <em><strong>windSpeedLevel</strong></em>, we will use a<em><strong> for()</strong></em> to go through every value in the <em><strong>windSusDir</strong> </em>column and use an <em><strong>if-else</strong></em> structure to set a direction for each value in the <em><strong>windDir</strong> </em>column:</p>
+<h6 class="p">for(day in 1:nrow(weatherData))</h6>
+<h6>{</h6>
+<h6 class="p">&nbsp; # if the direction is greater than 315 <em class="hl">OR</em> less than 45 degrees<br>&nbsp; if(weatherData$windSusDir[day] &gt;= 315 || <br>&nbsp; &nbsp;&nbsp; weatherData$windSusDir[day] &lt; 45)<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; weatherData$windDir[day] = "North";<br>&nbsp; }<br>&nbsp; # if the direction is greater than 45 <em class="hl">AND</em> less than 135 degrees<br>&nbsp; else if(weatherData$windSusDir[day] &gt;= 45 &amp;&amp; <br>&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; weatherData$windSusDir[day] &lt; 135)<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; weatherData$windDir[day] = "East";<br>&nbsp; }<br>&nbsp; # if the direction is greater than 135 <em class="hl">AND</em> less than 225 degrees<br>&nbsp; else if(weatherData$windSusDir[day] &gt;= 135 &amp;&amp; <br>&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; weatherData$windSusDir[day] &lt; 225)<br>&nbsp; {<br>&nbsp; &nbsp; weatherData$windDir[day] = "South";<br>&nbsp; }<br>&nbsp; else # the direction is between 225 and 315 degrees<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; weatherData$windDir[day] = "West";<br>&nbsp; }</h6>
+<h6>}</h6>
+<p></p>
+<p>The new <em><strong>windDir</strong> </em>column is shown in <em class="ref" id="r-newCols">fig ##</em>.</p>
+<h3>Change in temperature</h3>
+<p>Finally, we are going to create a column that gives the difference between the current day's high temperature and the previous day's high temperature.&nbsp;</p>
+<p></p>
+<p>We need <strong>366</strong> values to complete the whole column, but there is no day previous to the first day on the column.&nbsp; So, there is no first value and we only have <strong>365</strong> difference values. To fix this issue, we set the first value to <em><strong>NA</strong></em>.</p>
+<p></p>
+<p>Again, we are going to embed an <em><strong>if-else</strong></em> structure inside a <em><strong>for()</strong></em> that goes through all <strong>366</strong> rows in <em><strong>weatherData</strong></em>.&nbsp; The first value is set to <em><strong>NA</strong></em>, the other values are set to the different between the two days.</p>
+<p></p>
+<h6 class="p">for(day in 1:nrow(weatherData))</h6>
+<h6>{</h6>
+<h6 class="p">&nbsp; if( day == 1)&nbsp; # no day before the first day<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; weatherData$changeMaxTemp[day] = NA; <br>&nbsp; }<br>&nbsp; else&nbsp; # subtract previous day's maxTemp from current day's maxTemp<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; weatherData$changeMaxTemp[day] = weatherData$maxTemp[day] -<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; weatherData$maxTemp[day-1];<br>&nbsp; }</h6>
+<h6>}</h6>
+<p></p>
+<p><img src="../Images/GGP-01-06-NewColumns.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="newCols">The three new columns in <strong>weatherData</strong></h5>
+<p><strong></strong></p>
+<p class="ref" id="l-oneFor">Extension: one <em><strong>for()</strong></em> for all <em><strong>if-else</strong></em> structures</p>
+<h3>Saving the new dataframe</h3>
+<p>We are going to use the new dataframe in future lessons, so let's save it to the <em><strong>data</strong> </em>folder as <em><strong>LansingNOAA2016-3.csv</strong></em>:</p>
+<h6 class="p">write.csv(weatherData, file="data/LansingNOAA2016-3.csv");</h6>
+<h2>Our first boxplot</h2>
+<p>The GGPlot component we use to create a boxplot is <em><strong>geom_boxplot()</strong></em>.&nbsp; Our first boxplot will use two of the columns we just created: <em><strong>changeMaxTemp</strong></em> vs. <em><strong>windDir</strong></em>.</p>
+<p></p>
+<h6 class="p">#### Part 2: Plot Wind Speed vs. wind direction<br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_boxplot(mapping=aes(x=windDir, y=changeMaxTemp)) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Change in Temperature vs. Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Degrees (Fahrenheit)");<br>plot(thePlot);</h6>
+<p></p>
+<p>In <em class="ref" id="r-first">fig ##</em> we see that North winds seem to be associated with decreasing temperatures, and South winds seem to be associated with increasing temperatures.&nbsp; This makes sense as northerly winds often come from the Arctic and southerly winds often come from the Gulf of Mexico.</p>
+<p></p>
+<p><img src="../Images/GGP-01-06-FirstBoxPlot.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="first">Our first boxplot: change in temperature vs. wind direction</h5>
+<p></p>
+<p class="note">Note: The warning in <em class="ref" id="r-first">fig ##</em> is appearing because there is an <strong>NA</strong> value in the change in temperature data.</p>
+<h3>Variation: violin plot</h3>
+<p>One variation of a boxplot is the violin plot, which shows distribution instead of quantiles.&nbsp; The component <em><strong>geom_violin()</strong></em> plots a violin plot but, otherwise, works like a <em><strong>geom_boxplot().&nbsp;</strong> </em></p>
+<p><em><strong></strong></em></p>
+<p>The parameter <em><strong>na.rm=TRUE</strong> </em>was added to stop GGPlot from warning us every time that there is an <strong>NA</strong> value in the data (because the first value in <em><strong>changeMaxTemp </strong></em>is <strong></strong><em><strong>NA</strong></em>).&nbsp; This will be added to all subsequent plots.</p>
+<p><em><strong></strong></em></p>
+<h6 class="p">#### Part 3: Violin plot of Wind Speed vs. wind direction<br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">geom_violin</em>(mapping=aes(x=windDir, y=changeMaxTemp),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">na.rm=TRUE</em>) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Change in Temperature vs. Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Degrees (Fahrenheit)");</h6>
+<h6 class="p">plot(thePlot);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-06-ViolinPlot.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Violin plot of change in temperature vs wind direction</h5>
+<h3>Variation: Bars at the end of the whiskers</h3>
+<p class=""><em><strong>geom_boxplot()</strong></em> has no support for bars on the end of the boxplot whiskers.&nbsp; One somewhat hacky way to add bars is to create another plotting component on top of the boxplot.&nbsp; The component is <em><strong>stat_boxplot()</strong></em>, which contains error bars.</p>
+<p class=""></p>
+<p class="">In the following code, <em><strong>stat_boxplot()</strong></em> plots just the whiskers and error bars.&nbsp; The parameter <em><strong>width</strong></em> takes multipliers<em> val</em>u<em>es </em>with <strong>1</strong> meaning the error bar takes up the whole column (i.e., same width as the boxplot).&nbsp; So, <em><strong>width=0.2</strong></em> means the error bar takes up 20% of the column.<em class="hl"></em></p>
+<p></p>
+<h6 class="p">#### Part 4: Add error bars<br>thePlot = ggplot(data=weatherData) +<br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <em class="hl">stat_boxplot(mapping=aes(x=windDir, y=changeMaxTemp), </em></h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; na.rm=TRUE,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom = "errorbar",</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">width = 0.2)</em> +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_boxplot(mapping=aes(x=windDir, y=changeMaxTemp),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; na.rm=TRUE) +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Change in Temperature vs. Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Degrees (Fahrenheit)");<br>plot(thePlot);</h6>
+<p></p>
+<p class="note">Note: <em><strong>stat_boxplot()</strong> </em>is coded before and, hence, plotted behind <em><strong>geom_boxplot()</strong></em></p>
+<p></p>
+<p><img src="../Images/GGP-01-06-ErrorBars.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Adding error bars to a boxplot (there is currently no elegant solution for this)</h5>
+<h2>Reordering x-axis values</h2>
+<p>The x-axis (Wind Direction) labels go in alphabetical order: <strong>East</strong>, <strong>North</strong>, <strong>South</strong>, <strong>West</strong>.&nbsp; GGPlot will default to an alphabetical ordering if factor levels are not provided.&nbsp; We can force the issue by creating a factor, called <em><strong>windDirFact</strong></em>, with the levels provided in the preferred order:</p>
+<p></p>
+<h6 class="p">### Part 5: Re-order the directions on the x-axis using factor(s)</h6>
+<h6 class="p">windDirFact = factor(weatherData$windDir,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; levels=c("North", "East", "South", "West"));</h6>
+<p></p>
+<p>Now we use the factor <em><strong>windDirFact</strong> </em>in place of <em><strong>windDir </strong></em>-- just remember to replace <em><strong>windDir</strong> </em>with <em><strong>winDirFact</strong> </em>in both the <em><strong>stat_boxplot()</strong></em> and <em><strong>geom_boxplot()</strong></em> components.</p>
+<p></p>
+<h6 class="p">thePlot = ggplot(data=weatherData) +<br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; stat_boxplot(mapping=aes(x=<em class="hl">windDirFact</em>, y=changeMaxTemp),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; na.rm=TRUE,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom = "errorbar",</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; width = 0.2) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_boxplot(mapping=aes(x=<em class="hl">windDirFact</em>, y=changeMaxTemp),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; na.rm=TRUE) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Change in Temperature vs. Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Degrees (Fahrenheit)");<br>plot(thePlot);</h6>
+<p></p>
+<p>The boxplots are rearranged in order of the factor levels.</p>
+<p></p>
+<p><img src="../Images/GGP-01-06-ReorderAxis.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Reordering the categorical values on the x-axis</h5>
+<h2>Modifying Outliers</h2>
+<p>There are many parameters in the component <em><strong>geom_boxplot()</strong></em> that relate to outliers:</p>
+<ul>
+<li><em><strong>outlier.shape</strong></em>: the <a href="http://www.sthda.com/english/wiki/r-plot-pch-symbols-the-different-point-shapes-available-in-r" target="_blank" rel="noopener">shape number</a> (1-25) or character (in quotes) used to represent the outlier<br><em class="note">note: <strong>outlier.shape</strong> = <strong>NA</strong> will remove the outliers from the plot</em></li>
+<li><em><strong>outlier.color</strong></em>: outlier color</li>
+<li><em><strong>outlier.size</strong></em>: outlier size, as a numeric multiplier</li>
+<li><em><strong>outlier.alpha</strong></em>: outlier transparency (from<strong> 0</strong>-invisible to <strong>1</strong>-opaque) -- good for situations where outliers overlap</li>
+<li><em><strong>outlier.fill</strong></em>: outlier fill color (only <em><strong>outlier.shape</strong></em> between <strong>21</strong>-<strong>25 </strong>use fill color)</li>
+<li><em><strong>outlier.stroke</strong></em>: size of the border as a multiplier (only useful for shapes that have a fill -- otherwise, use <em><strong>outlier.size</strong></em>)</li>
+</ul>
+<p></p>
+<p>In the following example, I change four of the outlier parameters</p>
+<h6 class="p">thePlot = ggplot(data=weatherData) +<br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; stat_boxplot(mapping=aes(x=windDirFact, y=changeMaxTemp),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; na.rm=TRUE,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom = "errorbar",</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; width = 0.2) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_boxplot(mapping=aes(x=windDirFact, y=changeMaxTemp),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; na.rm=TRUE,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">outlier.shape = "@", </em></h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">outlier.color = "red"</em>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">outlier.alpha = 0.6, </em></h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">outlier.size = 4</em> ) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Change in Temperature vs. Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Degrees (Fahrenheit)");<br>plot(thePlot);</h6>
+<p></p>
+<p>The outliers are now red, 60% opaque (40% transparent), 4mm tall, and shaped like an "@".</p>
+<p></p>
+<p><img src="../Images/GGP-01-06-Outliers.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Modifying the shape, color, alpha, and size of the outliers</h5>
+<p></p>
+<p>Note: the author recognizes the tacky nature of the outliers' styling -- this is being used for demo purposes.&nbsp; For the next plot, I will set <em><strong>outlier.shape</strong> </em>to <em><strong>NA</strong> </em>to remove the outliers.</p>
+<h2>Adding text to the plot</h2>
+<p>We are going to add text to (i.e., annotate) the plot.&nbsp; The text will display the median <strong>Change In Temperature</strong> values for days where the winds come from the <strong>North</strong> and days where the winds come from the <strong>South</strong>.&nbsp;</p>
+<p></p>
+<p>To this we need to:</p>
+<ul>
+<li>Find the rows in <em><strong>weatherData</strong> </em>that have <strong>North</strong> winds and the rows in <em><strong>weatherData</strong> </em>that have <strong>South</strong> winds</li>
+<li>Find the median <em><strong>changeMaxTemp</strong> </em>for rows that have <strong>North</strong> winds and rows that have <strong>South</strong> winds</li>
+<li>Add the median value to the plot using the <em><strong>annotate()</strong></em> component</li>
+</ul>
+<h3>Find rows which() meet a condition&nbsp;</h3>
+<p>We use <em><strong>which()</strong></em> to find the indices of a vector that meet a condition.&nbsp; In this case the condition is: which values in <em><strong>windDir</strong> are</em> equal to <strong>North</strong><em>.&nbsp; </em>The index of the values are stored in <em><strong>northVals</strong>.</em><strong></strong></p>
+<h6 class="nn">northVals=which(weatherData$windDir == "North");</h6>
+<p class="p"></p>
+<p class="">And which values in <em><strong>windDir</strong> are</em> equal to <strong>South</strong></p>
+<h6 class="nn">southVals=which(weatherData$windDir == "South");</h6>
+<p></p>
+<p><em><strong>northVals</strong> </em>and <em><strong>southVals</strong> </em>are a vector of numbers.&nbsp; There are <strong>61</strong> <em><strong>North</strong> </em>values (starting with days 4,10, and 23) representing the 61 days that had northerly winds. There are <strong>101</strong> <em><strong>South</strong> </em>values (starting with days 5, 6, and 7)&nbsp;representing the 101 days that had southerly winds (<em class="ref" id="r-which">fig ##</em>).</p>
+<p></p>
+<p><img src="../Images/GGP-01-06-WhichWindDir.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="which">Finding the values in a vector that meet a condition using <strong>which()</strong></h5>
+<h3>Find median value of indexed values</h3>
+<p><em><strong>northVals</strong> </em>is a vector with all the days (i.e., rows) that had northerly winds. <em><strong>southVals </strong></em>is a vector with all the days (i.e., rows) that had southerly winds.&nbsp;</p>
+<p></p>
+<p>We want a vector that contains the change in temperature, <em><strong>changeMaxTemp</strong>,</em> for the 61 days in <em><strong>northVals:</strong></em></p>
+<h6 class="nn">weatherData[northVals, "changeMaxTemp"]&nbsp;</h6>
+<p></p>
+<p>And a vector that contains <em><strong>changeMaxTemp</strong> </em>values for the 101 days in <em><strong>southVals</strong></em>:</p>
+<h6 class="nn">weatherData[southVals, "changeMaxTemp"]</h6>
+<p></p>
+<p>To get the median of the indexed values above, we use <em><strong>median()</strong></em> and set <em><strong>na.rm = TRUE</strong></em> because we want to ignore the <strong>NA</strong> values in <em><strong>changeMaxTemp.</strong></em></p>
+<p></p>
+<p>In the following code, the median values for noth and south winds are saved to the variables <em><strong>northMed</strong> </em>and <em><strong>southMed</strong></em>.</p>
+<h6 class="p">northMed = median(<em class="hl">weatherData[northVals,"changeMaxTemp"]</em>, na.rm=TRUE);<br>southMed = median(<em class="hl">weatherData[southVals,"changeMaxTemp"]</em>, na.rm=TRUE);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-06-MedianValues.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="median">Median <strong>changeMaxTemp</strong> values for days with <strong>North</strong> and <strong>South</strong> winds</h5>
+<h3>Annotate plot with median values</h3>
+<p>Now we just need to put the median values (<em><strong>northMed</strong> </em>and <em><strong>southMed</strong></em>) on the plot using the <em><strong>annotate()</strong></em> component.&nbsp;</p>
+<p></p>
+<p>The subcomponents we set in <em><strong>annotate()</strong></em> are:</p>
+<ul>
+<li><strong>geom</strong>: the type of value we are putting on the plot (in this case, <strong>text</strong>)</li>
+<li><strong>x</strong>: x-position of the text -- for discrete axis, x=1 is the location of the first plot, x=2 is the second plot...</li>
+<li><strong>y</strong>: y-position of the text -- for continuous plot, this value matches the value on the axis</li>
+<li><strong>color</strong>: color of text</li>
+<li><strong>label</strong>: the text on the plot -- using <em><strong>paste()</strong></em>, we will put together the text "median:" and the variable that holds the calculated median value<br><br></li>
+</ul>
+<p>We are adding two <em><strong>annotate()</strong> </em>components added to the plot -- one for <strong>North</strong>, the other for <strong>South</strong></p>
+<h6 class="p">thePlot = ggplot(data=weatherData) +<br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; stat_boxplot(mapping=aes(x=windDirFact, y=changeMaxTemp),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; na.rm=TRUE,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom = "errorbar",</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; width = 0.2) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_boxplot(mapping=aes(x=windDirFact, y=changeMaxTemp),&nbsp;</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; na.rm=TRUE,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; outlier.shape = "@",</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; outlier.color = "red",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; outlier.alpha = 0.6,</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; outlier.size = 4 ) +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">annotate(geom="text",</em>&nbsp;&nbsp;&nbsp; # North median</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">x=1,</em></h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">y=20, </em></h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">color="blue",&nbsp;&nbsp; </em><br><em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </em><em class="hl">label=paste("median:", northMed) ) +</em><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">annotate(geom="text",</em>&nbsp;&nbsp;&nbsp; # South median</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">x=3, </em></h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">y=-10, </em></h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">color="red",</em>&nbsp; &nbsp; <br><em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </em><em class="hl">label=paste("median:", southMed) ) +</em><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Change in Temperature vs. Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Degrees (Fahrenheit)");<br>plot(thePlot);</h6>
+<p></p>
+<p>The text for the <strong>North</strong> median is on column <strong>1</strong> at the<strong> 20</strong> degree line.</p>
+<p>The text for the <strong>South</strong> median is on column <strong>3</strong> at the <strong>-10</strong> degree line.</p>
+<p></p>
+<p><img src="../Images/GGP-01-06-MedianText.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Adding median values to the plot using <strong>annotate()</strong></h5>
+<p><strong></strong></p>
+<h2>Application</h2>
+<ol>
+<li>Create a script file in your GGPlot Class Project called <em><strong>app06.r</strong></em>.&nbsp;</li>
+<li>Create a vector that holds the quantile values for the 20, 40, 60, and 80<sup>th</sup> percentile of <em><strong>stnPressure</strong></em>.</li>
+<li>Create a new column called <em><strong>pressureLevel</strong> </em>that creates five evenly spaced levels for <em><strong>stnPressure</strong></em></li>
+<li>Make a boxplot of <em><strong>windSusSpeed</strong> </em>vs <em><strong>pressureLevel</strong></em></li>
+<li>Find the dates for the three outliers at the lowest pressure level.&nbsp; The three outliers are also the three highest <em><strong>windSusSpeed</strong> </em>for the year.</li>
+<li>Label the outliers for the lowest pressure level with the dates on the plot.</li>
+</ol>
+<h3>Questions</h3>
+<ol>
+<li>What was your level of comfort with the lesson/application?</li>
+<li>What areas of the lesson/application confused or still confuses you?</li>
+<li>What are some things you would like to learn related to, but not covered in, this lesson?</li>
+</ol>
+<h2 class="extension" id="oneFor">Extension: One for() for all if-else structures</h2>
+<p>The three <em><strong>for()</strong> </em>used to create the three new column in <em><strong>weatherData</strong> </em>(<em><strong>windSpeedLevel</strong></em>, <em><strong>windDir</strong></em>, and <em><strong>changeMaxTemp</strong></em>) could all be condensed into one <em><strong>for()</strong> </em>because the three <em><strong>for()</strong></em> all execute over the same number of iterations, <strong>366</strong>.&nbsp;</p>
+<p></p>
+<h6>for(day in 1:nrow(weatherData))<br>{<br>&nbsp; ## Adding a column that gives relative wind speed for the day<br>&nbsp; # Winds less than 6.4 miles/hour -- label as "Low"<br>&nbsp; if(weatherData[day,"windSpeed"] &lt;= windSpeedQuant[1])<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; weatherData[day,"windSpeedLevel"] = "Low";<br>&nbsp; }<br>&nbsp; # Winds greater than 10.2 miles/hour -- label as "High"<br>&nbsp; else if(weatherData[day,"windSpeed"] &gt;= windSpeedQuant[2])<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; weatherData[day,"windSpeedLevel"] = "High";<br>&nbsp; }<br>&nbsp; else # wind speeds between 6.4 and 10.2 miles/hour -- label as "Medium"<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; weatherData[day,"windSpeedLevel"] = "Medium";<br>&nbsp; }</h6>
+<h6></h6>
+<h6>&nbsp; ## Adding a column that gives the cardinal wind direction<br>&nbsp; # if the direction is greater than 315 OR less than 45 degrees<br>&nbsp; if(weatherData[day,"windSusDir"] &gt;= 315 ||<br>&nbsp; weatherData[day,"windSusDir"] &lt; 45)<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; weatherData[day,"windDir"] = "North";<br>&nbsp; }<br>&nbsp; # if the direction is greater than 45 AND less than 135 degrees<br>&nbsp; else if(weatherData[day,"windSusDir"] &gt;= 45 &amp;&amp;<br>&nbsp; weatherData[day,"windSusDir"] &lt; 135)<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; weatherData[day,"windDir"] = "East";<br>&nbsp; }<br>&nbsp; # if the direction is greater than 135 AND less than 225 degrees<br>&nbsp; else if(weatherData[day,"windSusDir"] &gt;= 135 &amp;&amp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; weatherData[day,"windSusDir"] &lt; 225)<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; weatherData[day,"windDir"] = "South";<br>&nbsp; }<br>&nbsp; else # the directions is between 225 and 315 degrees<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; weatherData[day,"windDir"] = "West";<br>&nbsp; }</h6>
+<h6>&nbsp; ### Adding a changeMaxTemp column<br>&nbsp; if(day == 1)<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; weatherData[day,"changeMaxTemp"] = NA;<br>&nbsp; }<br>&nbsp; else<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; weatherData[day,"changeMaxTemp"] = weatherData[day,"maxTemp"] -<br>&nbsp;&nbsp;&nbsp; weatherData[day-1,"maxTemp"];<br>&nbsp; }<br>}</h6>
+</body></html>

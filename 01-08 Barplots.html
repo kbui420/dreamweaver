@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head>
+	<title></title>
+	<meta charset="UTF-8">
+	 <script type="text/javascript"> document.write('<'+'!--'); </script>
+       <link rel="stylesheet" type="text/css" href="/content/DEVELOPMENT/2018/courses/DEV-belinsky-2018-BackendTest/Programming/Release/editor.css">
+    <!-- -->
+	<script>
+const D2LMathML="";
+		var scriptFile = document.createElement('script');
+		scriptFile.src = "https://cdn.jsdelivr.net/gh/QFCatMSU/OnlineClassBackEnd/module.js";
+		document.getElementsByTagName('head')[0].appendChild(scriptFile);
+	</script>
+</head>
+
+<body>
+<p class="previousLesson">Boxplots 2</p>
+<p class="nextLesson">Text Plots</p>
+<h1 class="title" id="title">01-08: Barplots</h1>
+<h2>Purpose</h2>
+<ul>
+<li>Create barplots</li>
+<li>Use gradients to present a variable in a barplot</li>
+<li>Reorder a data frame</li>
+</ul>
+<h2>Issues</h2>
+<p>- Can we plot in the order of a column without reordering the whole data frame?</p>
+<h2>Get data</h2>
+<p class="fs">We are going to use the data file, <a href="https://cdn.jsdelivr.net/gh/QFCatMSU/GGPlot-Class-Material/data/LansingNOAA2016-3.csv" target="_self" class="download">LansingNOAA2016-3.csv</a>, so we can access the <em><strong>dateYr </strong></em>and <strong></strong><em><strong>season </strong></em>columns.&nbsp;</p>
+<h6>source( file="scripts/reference.R" ); <br>weatherData = read.csv( file="data/LansingNOAA2016-3.csv", <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stringsAsFactors = FALSE );</h6>
+<p></p>
+<p>We are going to focus on the <em><strong>precip</strong> </em>column, so let's take a look at it by opening <em><strong>weatherData</strong> </em>in the main window:</p>
+<p></p>
+<p><img src="../Images/GGP-01-08-StringVector.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="dataframe">The <em><strong>precip</strong> </em>column in weatherData -- notice the non-numeric values in it.</h5>
+<h3>Reformatting the precip column</h3>
+<p class="">We are going to create a bar plot of seasonal precipitation but, before we do this, we need all the values in the <em><strong>precip</strong> </em>column to be numeric.&nbsp; The problem is that this data frame uses the character <strong>T</strong> to indicate there was a trace of precipitation for the day (<em class="ref" id="r-dataframe">fig ##</em>).&nbsp; If there is even one non-numeric value in a column, <em class="hl">R will treat all values in the column as characters, or strings</em>.&nbsp; This means that <strong>0.25</strong> would be treated by R as the four characters <strong>"0.25",</strong> not as a number -- and you cannot do mathematical operations on characters.</p>
+<p></p>
+<p>So, we need to convert <strong>T</strong> into a number.&nbsp; Since the lowest measured value for precipitation is <strong>0.01</strong> inches, we will convert all <strong>T</strong> values to half that, or <strong>0.005</strong>.</p>
+<p></p>
+<p>To convert <strong>T</strong> to <strong>0.005</strong>, we will<em><strong></strong></em>:</p>
+<ul>
+<li>copy <em><strong>precip</strong> </em>to a new column, <em><strong>precipNum </strong></em>-- <em class="note">note: we could just convert <strong>precip</strong> but it is best to maintain the original columns in the data frame</em></li>
+<li>go through all values in the new column, <em><strong>precipNum</strong></em>,and change <strong>T</strong> to <strong>0.005</strong> <strong></strong></li>
+<li>convert <em><strong>precipNum</strong> </em>to a numeric column</li>
+</ul>
+<p></p>
+<h6>#### Part 1: Convert trace rain to the numeric value 0.005<br># Copy precip values to a new column, precipNum</h6>
+<h6>weatherData$precipNum = weatherData$precip;</h6>
+<h6></h6>
+<h6># Go through all rows in weatherData<br>for(i in 1:nrow(weatherData))<br>{<br>&nbsp; # check precipNum value -- if the value is T, change to 0.05<br>&nbsp; if(weatherData$precipNum[i] == "T")<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; weatherData$precipNum[i] = 0.005;<br>&nbsp; }<br>}</h6>
+<p></p>
+<p class="ref" id="r-for-vector">Extension: For loop vs. vector operation</p>
+<p><br>The <em><strong>for()</strong></em> converted every <strong>T</strong> value in <em><strong>precipNum</strong> </em>to <strong>0.005</strong> -- so every value in <em><strong>precipNum</strong> </em>consists of only numbers.&nbsp; But, the column will still be treated as characters <em class="hl">until we explicitly tell R to make it numeric</em> -- using <em><strong>as.numeric()</strong></em>.</p>
+<h6># convert precipNum column to numeric<br>weatherData$precipNum = as.numeric(weatherData$precipNum);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-08-NumericVector.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Precipitation values as numbers in the new column</h5>
+<h2>The first barplot</h2>
+<p>We are going to use the plotting component <em><strong>geom_col()</strong></em> to create a bar plot that displays the precipitation (from the <em><strong>precipNum</strong> </em>column) for each <em><strong>season</strong></em>.&nbsp; In the <em><strong>mapping</strong> </em>parameter, we put <em><strong>season</strong> </em>on the x-axis and <em><strong>precipNum</strong> </em>on the y-axis -- GGPlot will automatically categorize <em><strong>season</strong> </em>by its four values.&nbsp;</p>
+<p></p>
+<p><em><strong>width</strong></em>, a commonly used subcomponent in <em><strong>geom_col()</strong></em>, measures the thickness of the bars.&nbsp; <em><strong>width</strong> </em>has values between <strong>0</strong> and <strong>1</strong>, with <strong>1</strong> meaning that the bar takes up the whole bin slot.</p>
+<p></p>
+<h6 class="p">#### Part 2: Plot the precipitation for each season<br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">geom_col(mapping=aes(x=season, y=precipNum), </em></h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">width=0.7)</em> +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Seasonal precipitation",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Seasons",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Precipitation (inches)");<br>plot(thePlot);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-08-BarPlot.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>A bar plot of precipitation for each season</h5>
+<h3>A bar plot using months</h3>
+<p>Next, we want the precipitation for each month, but we do not have a column in the data frame for month -- instead we have a column of dates that includes the month.&nbsp; We are going to create a <em><strong>month</strong> </em>column using the month values extracted from the <em><strong>date</strong> </em>column.</p>
+<p></p>
+<p>The process is to:</p>
+<ul>
+<li>Save the values from the <em><strong>dateYr</strong> </em>column as dates to a vector
+<ul>
+<li><em><strong>as.Date()</strong> </em>explicitly tells R that these values are dates -- not characters</li>
+</ul>
+</li>
+<li>Extract the month from <em><strong>dateYr</strong> </em>and save it to a new vector
+<ul>
+<li><em><strong>format()</strong> </em>is a generic R function that can format all types of values</li>
+<li><em><strong>format="%b"</strong></em> gives the abbreviate month (e.g., Jan, Feb),
+<ul>
+<li class="note">Note: <strong>format="%B"</strong> gives the full month name (e.g., January, February)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Save the months vector to <em><strong>weatherData</strong> </em>as the column <em><strong>month</strong></em></li>
+</ul>
+<p></p>
+<h6 class="p">#### Part 3: Creating a month column in the data frame<br>dates = as.Date(weatherData$dateYr);&nbsp; # save the date column to a vector<br>months = format(dates, format="%b");&nbsp; # extract the month -- save to vector<br>weatherData$month = months;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # save months to data frame as new column</h6>
+<h6 class="p"><br># The above three lines could be written as:<br># weatherData$month = format.Date(weatherData$dateYr, format="%b");</h6>
+<p></p>
+<p>Now we have a new column called <em><strong>month</strong> </em>in <em><strong>weatherData.<br></strong></em></p>
+<p><em><strong></strong></em></p>
+<p><em><strong><img src="../Images/GGP-01-08-Months.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></strong></em></p>
+<h5><em>The m</em>onth indexes the month for each row in the column</h5>
+<h3>Plotting by month</h3>
+<p>We will use the same code as above to make a barplot of <em><strong>precipitation</strong> </em>for each <em><strong>month.</strong></em></p>
+<h6 class="p">#### Part 4: Plot precipitation for each month<br>thePlot = ggplot(data=weatherData) +<br>geom_col(mapping=aes(<em class="hl">x=month, y=precipNum</em>),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; width=0.7) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Monthly precipitation",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Month",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Precipitation (inches)");<br>plot(thePlot);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-08-BarPlotByMonth.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="monthlyPrecip">Precipitation plotted for each month -- in alphabetical order</h5>
+<h3>Ordering the months correctly</h3>
+<p>GGPlot saw the months as 12 categories and, not so helpfully in this case, put them in alphabetical order (<em class="ref" id="r-monthlyPrecip">fig ##</em>).&nbsp; To put the month in the more familiar order, we will use the <em><strong>scale_x_discrete()</strong></em> component.&nbsp; <em class="note">Note: there are analogous components for the y-axis and continuous values -- <strong>scale_y_discrete()</strong>, <strong>scale_x_continuous()</strong>, and <strong>scale_y_continuous()</strong>.</em></p>
+<p></p>
+<p>The parameter in <em><strong>scale_x_discrete()</strong></em> we need to set is <em><strong>limits</strong></em>.&nbsp; On the <em><strong><a href="https://ggplot2.tidyverse.org/reference/scale_discrete.html" target="_blank" rel="noopener">GGPlot help page for <em><strong>scale_discrete()</strong></em></a></strong></em>, <em><strong>limits</strong> </em>is defined as "a character vector that defines [all] <em class="hl">possible values</em> of the scale and their order."</p>
+<p></p>
+<p>We want a character vector of the months (i.e., <strong>month[1]</strong> = "<strong>Jan</strong>", <strong>month[2]</strong>="<strong>Feb</strong>"...)-- we could create our own but already exists a month vector predefined in R called <em><strong>month.abb</strong></em>.</p>
+<p></p>
+<h6 class="p">#### Part 5: Reorder the months on the x-axis<br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_col(mapping=aes(x=month, y=precipNum),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; width=0.4) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">scale_x_discrete(limits = month.abb)</em> +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Monthly precipitation",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Month",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Precipitation (inches)");<br>plot(thePlot);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-08-OrderMonths.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Precipitation for each month -- with the months in order!</h5>
+<h2>Adding lines to a plot</h2>
+<p>It would be nice to see average precipitation on the plot -- so we will add a horizontal line at the value of the average precipitation using the <em><strong>geom_hline()</strong></em> component.</p>
+<p></p>
+<p>First, we need to find the monthly average.&nbsp; I am going to cheat a bit and just add up all <strong>366</strong> precipitation values in the <em><strong>precipNum</strong> </em>column, using the <em><strong>sum()</strong> </em>function and then divide the sum by <strong>12</strong>:</p>
+<h6 class="p">monthlyAvg = sum(weatherData$precipNum)/12;</h6>
+<p></p>
+<p>We want to add a horizontal line that intercepts the <em><strong>monthlyAvg</strong>&nbsp;<strong> </strong></em>point.&nbsp; In the mapping for <em><strong>geom_hline()</strong></em>, we use the <em><strong>yintercept</strong></em> to map the <em><strong>monthlyAvg</strong> </em>point to a line on the plot.</p>
+<p></p>
+<h6 class="p">#### Part 6: Add the monthly average as a horizontal line</h6>
+<h6>monthlyAvg = sum(weatherData$precipNum)/12;</h6>
+<h6></h6>
+<h6>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_col(mapping=aes(x=month, y=precipNum),</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; width=0.5) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_x_discrete(limits = month.abb) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">geom_hline(mapping = aes( yintercept = monthlyAvg ),</em><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">color="red", </em></h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">size=1.5, </em></h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">linetype=2)</em> +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Monthly precipitation",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Month",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Precipitation (inches)");<br>plot(thePlot);</h6>
+<p></p>
+<p class="note">Note: We also modified the <em><strong>color</strong></em>, <em><strong>size</strong></em>, and <em><strong>linetype </strong></em>parameters in <strong><em>geom_hline()</em></strong>.</p>
+<p class="note"></p>
+<p><img src="../Images/GGP-01-08-HorizontalLine.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Adding a horizontal line to the plot</h5>
+<h2>Coloring by variable</h2>
+<p>We can add more information to the bar plots by using a <em><strong>fill</strong> </em>color to represent another variable (in this case: atmospheric pressure).&nbsp; We will <em><strong>fill</strong> </em>the bar in the barplot using the data from the <em><strong>stnPressure</strong> </em>column (atmospheric pressure).</p>
+<p></p>
+<p><em><strong>fill</strong> </em>maps the data in <em><strong>stnPressure </strong></em>to the bars on the plot<em>, </em>so <em><strong>fill</strong> </em>is added to GGPlot as a <em><strong>mapping</strong> </em>parameter.&nbsp; <em class="note"></em></p>
+<p></p>
+<h6 class="p">#### Part 7: Add a fill<br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_col(mapping=aes(x=month, y=precipNum, <em class="hl">fill=stnPressure</em>),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; width=0.5) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_x_discrete(limits = month.abb) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_hline(mapping = aes( yintercept= sum(precipNum)/12 ),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color="red",</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size=2,</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; linetype=2) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Monthly precipitation",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Month",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Precipitation (inches)");<br>plot(thePlot);</h6>
+<p></p>
+<p class="note">Note: GGPlot will automatically produce a legend when you use <em><strong>fill</strong> as a </em><strong>mapping </strong>parameter.</p>
+<p></p>
+<p><img src="../Images/GGP-01-08-Fill.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Adding a fill to the bar plot.</h5>
+<h3>Reordering the data frame</h3>
+<p>GGPlot generated a legend and produced a color chart for the range of values in <em><strong>stnPressure</strong></em>.&nbsp; However, the color mapping on the bars is a little confusing.&nbsp; GGplot maps <em><strong>stnPressure</strong></em> in order by date. &nbsp; This is because the rows of the data frame go in order of date.&nbsp; So, the top of March's bar (dark blue) has the color for the <em><strong>stnPressure</strong> </em>on March 1 and the bottom (medium blue) has the color for the <em><strong>stnPressure</strong> </em>on March 31.</p>
+<p></p>
+<p>In would be more helpful if <em><strong>fill</strong> </em><em></em>was presented in the order of the values in <em><strong>stnPressure</strong> </em>instead of <em><strong>dates</strong></em>.</p>
+<p></p>
+<p>There is no easy way to reorder the plot by the <em><strong>stnPressure</strong> </em>values -- every solution involves reordering the data frame so the rows go in order of increasing values of <em><strong>stnPressure</strong></em>.</p>
+<p></p>
+<p>So, we will reorder the rows of the <em><strong>weatherData</strong> </em>data frame using <em><strong>order()</strong></em>:</p>
+<h6 class="p">reorderedData = weatherData[order(weatherData$stnPressure), ];</h6>
+<p>What the line of code says is:</p>
+<ul>
+<li>take the <em><strong>weatherData</strong> </em>data frame</li>
+<li>reorder the rows in <em><strong>weatherData</strong></em> by the values in <em><strong>stnPressure</strong> </em></li>
+<li>save the reordered data frame to <em><strong>reorderedData</strong></em></li>
+</ul>
+<p></p>
+<p><img src="../Images/GGP-01-06-ReorderedData.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>The reordered data frame</h5>
+<p></p>
+<p>The rows of the new data frame go in order of <em><strong>stnPressure</strong> </em>instead of <em><strong>date</strong></em>.&nbsp; Notice that <strong>March 31</strong> is the first date and there was <strong>1.17</strong> inches of rain that day -- not a coincidence that is was also the day with the lowest <em><strong>stnPressure</strong></em>!</p>
+<h3>Plotting with reordered dataframe</h3>
+<p>Now we will use <em><strong>reorderedData</strong> </em>instead of <em><strong>weatherData</strong></em>:</p>
+<h6 class="p">#### Part 8: Reorder the data<br>reorderedData = weatherData[order(weatherData$stnPressure),];<br><br>thePlot = ggplot(<em class="hl">data=reorderedData</em>) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_col(mapping=aes(x=month, y=precipNum, fill=stnPressure),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; width=0.5) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_x_discrete(limits = month.abb) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_hline(mapping = aes( yintercept= sum(precipNum)/12 ),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; color="red",</h6>
+<h6 class="p"><em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</em> size=1.5,</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; linetype=2) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Monthly precipitation",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Month",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Precipitation (inches)",</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">fill= "Pressure"</em>);<br>plot(thePlot);</h6>
+<p></p>
+<p class="note">Note: I also changed the legend title using the <strong>fill</strong> parameter in <strong>labs().</strong></p>
+<p></p>
+<p><img src="../Images/GGP-01-08-ReorderedData.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>The bar plot reflects the numeric ordering of <em><strong>stnPressure</strong>&nbsp;</em></h5>
+<h2>Legends and mapping</h2>
+<p>The default <em><strong>fill</strong> </em>is a gradient from dark blue (low <em><strong>stnPressure</strong> </em>values) to light blue (high <em><strong>stnPressure</strong> </em>values).&nbsp; We can define our own gradient to use for <em><strong>fill</strong></em>.&nbsp; We use the<em><strong> scale_fill_gradient()</strong></em> component to define the gradient color range.&nbsp; The two parameters we need to set are <em><strong>low</strong> </em>and <em><strong>high</strong> </em>(i.e., the two ends of the gradient).</p>
+<p></p>
+<p>You can use color names for <em><strong>low</strong> </em>and <em><strong>high</strong> </em>but I decided to use <strong>rgb</strong> (red-green-blue) colors:</p>
+<h6 class="nn">scale_fill_gradient(low = rgb(red=1, green=0.5, blue=0),</h6>
+<h6 class="nn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; high = rgb(red=0, green=0, blue=1))</h6>
+<p></p>
+<p>RGB colors represent the three <em class="hl">primary light colors: </em>red, green, and blue.</p>
+<p></p>
+<p>The <em><strong>low</strong> </em>I used is all red light and half green light (this makes orange): <strong>rgb(red=1, green=0.5, blue=0)</strong> ,</p>
+<p>and <em><strong>high</strong> </em>is all blue light: <strong></strong><strong>rgb(red=0, green=0, blue=1)</strong>.</p>
+<p></p>
+<p class="note">Note: I also change the horizontal line to a dark green <em><strong>rgb(red=0, green=0.5, blue=0)</strong></em> to give it better contrast with the boxplots.</p>
+<p></p>
+<h6 class="p">#### Part 9: Change fill color and legend title<br>reorderedData = weatherData[order(weatherData$stnPressure),];<br>thePlot = ggplot(data=reorderedData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_col(mapping=aes(x=month, y=precipNum, fill=stnPressure),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; width=0.4) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_x_discrete(limits = month.abb) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_hline(mapping = aes( yintercept= sum(precipNum)/12 ),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">color= rgb(red=0, green=0.5, blue=0)</em>,</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size=2,</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; linetype=2) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">scale_fill_gradient(low = rgb(red=1, green=0.5, blue=0),</em>&nbsp;&nbsp; # orange<em class="hl"><br></em></h6>
+<h6 class="nn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <em class="hl">high = rgb(red=0, green=0, blue=1))</em> +&nbsp; # blue<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Monthly precipitation",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Month",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Precipitation (inches)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fill = "Pressure");<br>plot(thePlot);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-08-FillGradient.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Adding a color gradient to the bar plot fill.</h5>
+<p></p>
+<p>This plot shows that, while March did not have the most rain, it had the most severe weather (bright orange color representing the lowest pressure).&nbsp; And, as expected, rain falls tend to be greater when there is lower pressure.</p>
+<h2>Application</h2>
+<p>For this application, we will be using the <em><strong>heatDays</strong> </em>and <em><strong>coolDays</strong> </em>columns in <em><strong>weatherData</strong></em>.&nbsp; These columns measure how much heating or cooling is needed on a day to make a place comfortable.&nbsp; So, on a cold winter day, <em><strong>coolDays</strong> </em>would be <strong>zero</strong> and <em><strong>heatDays</strong> </em>would be high.&nbsp; On a hot summer day, <em><strong>heatDays</strong> </em>would be zero and <em><strong>coolDays</strong> </em>would be high. &nbsp;</p>
+<p></p>
+<p>Specifically, the number represents how far the average temperature of the day is from 65 (which was determined to be the most comfortable temperature).</p>
+<p></p>
+<ol>
+<li>Create a script file in your GGPlot Class Project called <em><strong>app08.r</strong></em>.</li>
+<li>Create a bar plot of Cooling Days (<em><strong>coolDays</strong></em>) for each month
+<ol>
+<li>Add a title, and put appropriate labels on the axes.</li>
+<li>Change the bar width to 0.6</li>
+<li>Create a vector that consists of the first two values in the <em><strong>weatherType</strong> </em>column (i.e., the new vector will have at most one weather condition for the day).</li>
+<li>Use the vector created in the previous step to fill the bars (for fun, you can try to just use <em><strong>weatherType</strong> </em>as the fill and see what happens...)</li>
+<li>Customize the colors of the 8 weather conditions (one of the conditions is empty).&nbsp; Do this using component <em><strong>scale_fill_manual</strong> </em>and the subcomponent <em><strong>values</strong></em>, which will be set a to a vector.&nbsp; <em class="note">Note: this is the discrete version of the component<strong> scale_fill_gradient</strong>.</em></li>
+</ol>
+</li>
+<li>Create a bar plot of Heating Days (<em><strong>heatDays</strong></em>) for each month
+<ol>
+<li>Add a title, and put appropriate labels on the axes.</li>
+<li>Change the bar width to 0.6</li>
+<li>Create a vector that consists of the first two values in the <em><strong>weatherType</strong> </em>column.</li>
+<li>Add a horizontal line to the plot that represent the sum of all <em><strong>coolDays</strong> </em>for the year (it should be in the 800s)</li>
+<li>Add a label (or, annotate) that describes what the line represents.</li>
+</ol>
+</li>
+<li>Combine Heating and Cooling Days into one barplot
+<ol>
+<li>Add a title, and put appropriate labels on the axes.</li>
+<li>Change the bar <strong>widths</strong> of both to<strong> 0.4</strong></li>
+<li>Change the bar <strong>fill </strong>to solid colors: <strong>red</strong> for <em><strong>heatDays</strong> </em>, <strong>blue</strong> for <em><strong>coolDays</strong></em><em><strong></strong></em><em><strong></strong></em></li>
+</ol>
+</li>
+</ol>
+<h3>Questions</h3>
+<ol>
+<li>What was your level of comfort with the lesson/application?</li>
+<li>What areas of the lesson/application confused or still confuses you?</li>
+<li>What are some things you would like to learn related to, but not covered in, this lesson?</li>
+</ol>
+<h2 class="extension" id="after_stat">Extension: side-by-side plots using after_stat()</h2>
+<p><em class="hl">There is a bug in GGPlot that does not allow you to both nudge and stack a bar plot -- so this section is actually not much help for this lesson.&nbsp; But, I will leave it here for posterity -- or the hope that a fix to the bug will come.</em></p>
+<p></p>
+<p>This is one of the more unusually challenging topics in GGPlot.&nbsp; The most common solution found online is to reshape your data frame using the <em><strong>dplyr</strong></em> package.&nbsp; This author sees this technique as overkill for what is needed.</p>
+<p></p>
+<p>Another common solution is to use the <em><strong>position_nudge</strong></em> attribute in the <em><strong>position</strong> </em>subcomponent in the graphing component, which in this lesson is <em><strong>geom_col()</strong></em>.&nbsp; For the example in this lesson this would look like:</p>
+<p></p>
+<h6>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_col(mapping=aes(x=month, y=heatDays),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fill = "red",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; width=0.6,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; position=position_nudge(x=-0.3)) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_x_discrete(limits = month.abb) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Heating and Cooling Days",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Month",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Cumulative Degrees (F)");<br>plot(thePlot);</h6>
+<p></p>
+<p>This technique successfully moves the bars 0.3 units to the left but it also changes the way the bar is presented.&nbsp; Instead of stacking the bars on top of each other (the default for <em><strong>geom_col()</strong></em>), it is now placing all bars at the y=0 axis.&nbsp; So, you only see the day with the highest value.&nbsp; This author considers this to be a bug in GGPlot as nudging and stacking should be mutually exclusive -- they should not affect each-other</p>
+<p></p>
+<p>The fix to this is to use <em><strong>after_stat()</strong></em>.&nbsp; <em><strong>after_stat()</strong></em> is a function that says to wait until all statistics have been calculated and then apply the calling function.</p>
+<h6>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_col(mapping=aes(x=month, y=heatDays),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fill = "red",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; width=0.6,</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; position=position_nudge(<em class="hl">after_stat(x=-0.3))</em>) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_x_discrete(limits = month.abb) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Heating and Cooling Days",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Month",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Cumulative Degrees (F)");<br>plot(thePlot);</h6>
+<p></p>
+<p>Now, all the bar will be stacked and nudged over.&nbsp; <em class="note">Note:<strong> after_stat()</strong> does not have its own parameters -- the parameters are for the caller (in this case, <strong>position_nudge()</strong>).</em>&nbsp;<em><strong> after_stat()</strong></em> is delaying the call and passing the parameter into <em><strong>position_nudge()</strong></em> after all statistics have been completed.</p>
+<h2 id="for-vector" class="">Extension: For loops vs. vector operations</h2>
+<p>The following code:</p>
+<div>
+<h6 title="">for(i in 1:nrow(weatherData))</h6>
+<h6>{</h6>
+<h6>&nbsp; # if the value is T, change to 0.05</h6>
+<h6>&nbsp; if(weatherData$precipNum[i] == "T")</h6>
+<h6>&nbsp; {&nbsp;</h6>
+<h6>&nbsp;&nbsp;&nbsp; weatherData$precipNum[i] = 0.005;</h6>
+<h6>&nbsp; }</h6>
+<h6>}</h6>
+</div>
+<p></p>
+<p>is functionally equivalent to the following code that uses vector operations:</p>
+<div>
+<h6>weatherData$precipNum[weatherData$precip == "T"] = 0.005;</h6>
+</div>
+<p></p>
+<p>Vector operations is often encouraged over using for loops but for loops are more robust and translate across all programming languages.&nbsp; So, this author would argue that it is important to understand how the for loop works even if you use the vector operations.</p>
+</body></html>

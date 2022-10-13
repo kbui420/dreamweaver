@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head>
+	<title></title>
+	<meta charset="UTF-8">
+	 <script type="text/javascript"> document.write('<'+'!--'); </script>
+       <link rel="stylesheet" type="text/css" href="/content/DEVELOPMENT/2018/courses/DEV-belinsky-2018-BackendTest/Programming/Release/editor.css">
+    <!-- -->
+	<script>
+const D2LMathML="";
+		var scriptFile = document.createElement('script');
+		scriptFile.src = "https://cdn.jsdelivr.net/gh/QFCatMSU/OnlineClassBackEnd/module.js";
+		document.getElementsByTagName('head')[0].appendChild(scriptFile);
+	</script>
+</head>
+
+<body>
+<p class="previousLesson">Boxplots 2</p>
+<p class="nextLesson">Multiplanel Plots</p>
+<h1 class="title" id="title">01-09: Text Plots and Legend Modifications</h1>
+<h2>Purpose</h2>
+<ul>
+<li>Use data values as points in a plot</li>
+<li>use grep to find index values</li>
+<li>customize gradients</li>
+<li>manipulate a legend</li>
+</ul>
+<h2>Concepts</h2>
+<h2>Get data</h2>
+<p class="fs">For this lesson, we will work from the data file <a href="https://cdn.jsdelivr.net/gh/QFCatMSU/GGPlot-Class-Material/data/LansingNOAA2016-3.csv" target="_self" class="download">LansingNOAA2016-3.csv</a>.</p>
+<h6>source( file="scripts/reference.R" ); <br>weatherData = read.csv( file="data/LansingNOAA2016-3.csv", <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stringsAsFactors = FALSE );</h6>
+<h2>A simple scatterplot</h2>
+<p>We will start with a simple scatterplot of Humidity (<em><strong>relHum</strong></em>) vs Temperature (<em><strong>avgTemp</strong></em>) using the component <em><strong>geom_point()</strong></em>.</p>
+<p></p>
+<p>The component <em><strong>theme_bw()</strong></em> creates a black and white themed plot with a border around the whole plot area. The <em><strong>theme()</strong></em> subcomponents <em><strong>panel.grid.major</strong> </em>and <em><strong>panel.grid.minor</strong></em> are used to remove the grid lines -- by setting them to a blank element, <em><strong>element_blank()</strong></em>.</p>
+<p></p>
+<h6 class="p">#### Part 1: Create a Humidity vs. Temperature scatterplot<br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point(mapping=aes(x=avgTemp, y=relHum)) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme(<em class="hl">panel.grid.major = element_blank()</em>, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">panel.grid.minor = element_blank()</em>) +</h6>
+<h6 class="p">&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; labs(title = "Humidity vs. Temperature",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Degrees (Fahrenheit)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Relative Humidity");<br>plot(thePlot);</h6>
+<p class=""></p>
+<p class="note">Reminder: <strong>theme()</strong> changes need to occur after <strong>theme_bw()</strong> is set because<strong> theme_bw()</strong> resets all <em><strong>theme()</strong></em> subcomponents.</p>
+<p class=""></p>
+<p class="p"><img src="../Images/GGP-01-09-Scatterplot.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="scale">Scatterplot with clean background and full border around plot</h5>
+<h2>Using dates instead of points</h2>
+<p>We use the <em><strong>geom_text()</strong> </em>component instead of <em><strong>geom_point()</strong></em> to place text values on the plot instead of points.&nbsp; In the <em><strong>mapping </strong></em>for <em><strong>geom_text()</strong></em>, the <em><strong>label</strong></em> parameter maps <em><strong>date </strong></em>to the text on the plot. In this case, <em><strong>relHum</strong> </em>vs <em><strong>avgTemp</strong> </em>is plotted using the corresponding values from the <em><strong>date</strong> </em>column instead of points.</p>
+<h6 class="nn">geom_text(mapping=aes(x=avgTemp, y=relHum, label=date))</h6>
+<p></p>
+<p>Looking at the full code for the plot:</p>
+<h6 class="p">#### Part 2: Use dates instead of points<br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">geom_text</em>(mapping=aes(x=avgTemp, y=relHum,<em class="hl"> label=date</em>)) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme(panel.grid.major = element_blank(), <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; panel.grid.minor = element_blank()) +</h6>
+<h6 class="p">&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; labs(title = "Humidity vs. Temperature",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Degrees (Fahrenheit)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Relative Humidity");<br>plot(thePlot);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-09-GeomText.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>A scatterplot of humidity that uses labels (date values) instead of points</h5>
+<h3>Formatting dates</h3>
+<p>The overlapping dates makes the plot unreadable, so we will change the <em><strong>size</strong> </em>of the text to <strong>2.5</strong> (<em><strong>size</strong> </em>is in millimeters) to save space and make the plot more readable:</p>
+<p></p>
+<h6 class="p">#### Part 3: Reformat the dates<br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_text(mapping=aes(x=avgTemp, y=relHum, label=date),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">color="darkgreen", </em></h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">size=2.5</em>) +&nbsp;&nbsp; # change size<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme(panel.grid.major = element_blank(), <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; panel.grid.minor = element_blank()) +</h6>
+<h6 class="p">&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; labs(title = "Humidity vs. Temperature",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Degrees (Fahrenheit)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Relative Humidity");<br>plot(thePlot);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-09-FormatDates.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Formatting and resizing the date values in the plot to remove some of the overlap</h5>
+<h2>Gradients</h2>
+<p>In the previous example, we changed the <strong>color</strong> of the <strong>date</strong> values to <strong>darkgreen</strong>. However, we can use multiple colors to better represent where the date values are in the year.&nbsp; For instance, we can make winter value more blue and summer values more red.&nbsp; In other words, we want to map <em><strong>color</strong> </em>to the data.&nbsp; To do this, we need to move <em><strong>color</strong> </em>inside the <em><strong>mapping</strong> </em>for <em><strong>geom_text()</strong></em>.&nbsp;</p>
+<p></p>
+<p>We need to define&nbsp; vector with 366 colors.&nbsp; For this example, we will define a vector and GGPlot will add the colors.</p>
+<p></p>
+<p>The easiest way is to set <em><strong>color</strong> </em>to the sequence <strong>1:366</strong> or, for a more future-proof solution, set <em><strong>color</strong> </em>to <strong>1:nrow(weatherData), </strong>which is equivalent to <strong>1:366</strong>.</p>
+<p></p>
+<h6 class="p">#### Part 4: Add gradient colors<br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_text(mapping=aes(x=avgTemp, y=relHum, <em class="hl">color=1:nrow(weatherData)</em>,</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; label=date),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size=2.5) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme(panel.grid.major = element_blank(), <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; panel.grid.minor = element_blank()) +</h6>
+<h6 class="p">&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; labs(title = "Humidity vs. Temperature",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Degrees (Fahrenheit)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Relative Humidity");<br>plot(thePlot);</h6>
+<p></p>
+<p>Just like for <em><strong>fill</strong></em>, GGPlot automatically places a legend in the plot when <em><strong>color</strong> </em>is used.&nbsp; The default color gradient goes from dark blue (<strong>01-01</strong>, representing Jan 1) to light blue (<strong>12-31</strong>, representing December 31<strong></strong>).</p>
+<p></p>
+<p><img src="../Images/GGP-01-09-Gradient.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="gradient">Mapping the data to a gradient color</h5>
+<h3>Customizing gradient colors</h3>
+<p>To customize the gradient color, we will use the <em><strong>scale_color_gradientn()</strong> </em>component.&nbsp; The <strong class="hl">n</strong> in <em><strong>gradient</strong><strong class="hl">n </strong></em>refers to the fact that you can apply as many, or <strong>n</strong><em></em>, colors to the gradient as you want.</p>
+<p></p>
+<p>The default gradient (<em class="ref" id="r-gradient">fig ##</em>) was from light blue to dark blue -- it was a two color gradient.</p>
+<p></p>
+<p>We are going to create a <em><strong>colors</strong> </em>gradient with five colors:&nbsp;</p>
+<ul>
+<li>the first value (<strong>blue</strong>) is the color of the first plotted point (representing Jan 1)</li>
+<li>the last value (<strong>blue</strong>) is the color of the last plotted point (representing Dec 31)</li>
+<li>the colors in between (<strong>orange</strong>, <strong>red</strong>, <strong>green</strong>) are evenly spaced (approximately the beginning of spring, summer, and fall)</li>
+</ul>
+<p></p>
+<p><em class="note">Note: I used blue at the beginning and end of a gradient to have a smooth transition between December 31 and January 1.</em></p>
+<p></p>
+<p>The following code says <strong>blue</strong> is at both ends (0<sup>th</sup> and 100<sup>th</sup> percentile) and <strong>orange</strong>, <strong>red</strong>, and <strong>green</strong> will be evenly spaced (at the 25<sup>th</sup>, 50<sup>th</sup> and 75<sup>th</sup> percentile, respectively).</p>
+<h6 class="nn">scale_color_gradientn(colors=c("blue","orange","red","green","blue"))</h6>
+<p></p>
+<h6 class="p">#### Part 5: Customize gradient colors<br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_text(mapping=aes(x=avgTemp, y=relHum, color=1:nrow(weatherData),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; label=date),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size=2.5) +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em class="hl"> scale_color_gradientn(colors=c("blue","orange","red","green","blue"))</em> +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme(panel.grid.major = element_blank(), <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; panel.grid.minor = element_blank()) +</h6>
+<h6 class="p">&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; labs(title = "Humidity vs. Temperature",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Degrees (Fahrenheit)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Relative Humidity");<br>plot(thePlot);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-09-CustomGradient.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>A text plot where the color gradient represent the time of year</h5>
+<h2>Modifying the legend</h2>
+<p>We are going to make the following <em class="hl">modifications to the <strong>legend</strong></em>:</p>
+<ul>
+<li><em class="hl">title</em>:&nbsp; in<em><strong> labs()</strong></em> component, <em><strong>color</strong>&nbsp;</em>subcomponent -- this is because the legend maps color to the plot</li>
+<li><em class="hl">height</em>:&nbsp; in <em><strong>theme()</strong></em> component, <em><strong>legend.key.height</strong></em> subcomponent -- uses <em><strong>unit()</strong> </em>with a value and unit type, <em><strong>units</strong><br></em></li>
+<li><em class="hl">tick mark locations</em>: in <em><strong>scale_color_gradientn()</strong></em> component, <em><strong>breaks</strong>&nbsp;</em>subcomponent -- creates three tick marks, or <em><strong>breaks</strong></em></li>
+</ul>
+<ul>
+<li><em class="hl">labels</em>: in <em><strong>scale_color_gradientn()</strong></em> component, <em><strong>labels </strong></em>subcomponent -- <em class="hl">the number of labels must be the same as the number of tick marks</em> (in this case, 3)<em class="hl"><br></em></li>
+</ul>
+<p></p>
+<h6 class="p">#### Part 6: Customize legend<br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_text(mapping=aes(x=avgTemp, y=relHum, color=1:nrow(weatherData),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; label=date),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size=2.5) +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_color_gradientn(colors=c("blue","brown","red","green","blue"),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">breaks=c(91, 183, 274),&nbsp; # these are guesses</em><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">labels=c("Mar-21", "Jun-21", "Sep-21")</em>) +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme(panel.grid.major = element_blank(), <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; panel.grid.minor = element_blank(),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">legend.key.height = unit(40, units="pt")</em>) +&nbsp; # height of legend</h6>
+<h6 class="p">&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; labs(title = "Humidity vs. Temperature",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Degrees (Fahrenheit)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Relative Humidity",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">color = "Dates"</em>);&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; # give a better explanation! title of legend<br>plot(thePlot);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-09-CustomLegend.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Customizing the legend's title, size, tick marks, and labels</h5>
+<h2>Using grep<em class="hl"></em></h2>
+<p><em><strong>differences between which() and grep()</strong></em></p>
+<p></p>
+<p>In the last code snippet, I incorrectly guessed that March 21, June 21, and September 21 were, respectively, the Julian dates 91, 183, and 274.</p>
+<h6 class="nn">breaks=c(91, 183, 274),&nbsp;&nbsp;&nbsp; # incorrect Julian days<br>labels=c("Mar-21", "Jun-21", "Sep-21")</h6>
+<p></p>
+<p>To get the actual Julian dates, we can use <em><strong>grep()</strong></em> to find the index of a vector that contain a certain value.&nbsp;</p>
+<p></p>
+<p>In the following example, I call <em><strong>grep()</strong></em> with the vector I want to look at, <em><strong>weatherData$date</strong></em>, and the <em><strong>pattern</strong> </em>I am seeking within that vector.&nbsp; <em><strong>grep()</strong></em> will return the first index value in the vector that matches the <em><strong>pattern</strong></em>.&nbsp;</p>
+<p></p>
+<h6 class="p">#### Part 7: grep to find indexes<br>springIndex = grep(weatherData$date, pattern="3-21");<br>summerIndex = grep(weatherData$date, pattern="6-21");<br>fallIndex = grep(weatherData$date, pattern="9-21");<br>winterIndex = grep(weatherData$date, pattern="12-21");</h6>
+<p></p>
+<p>So, spring starts on Julian date <strong>81</strong>, summer on <strong>173</strong>, fall on <strong>265</strong>, and winter on <strong>356.</strong></p>
+<p><strong></strong></p>
+<p><img src="../Images/GGP-01-09-SeasonIndex.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Using grep to get the index values from the beginning of each season</h5>
+<p></p>
+<p><em><strong>grep()</strong> </em>is a very powerful tool for doing pattern recognition within data, most of which is beyond the scope of this class.&nbsp; The power arises from the flexibility of the <em><strong>pattern</strong> </em>parameter, which can be used to do much more complex searches. <em class="ref" id="r-pattern">Extension: the <strong>pattern</strong> parameter.</em></p>
+<h3>Using the index values from grep()</h3>
+<p>Now we will replace the <em><strong>breaks</strong> </em>values with the <em><strong>season</strong> </em>index values calculated using <em><strong>grep()</strong></em> and replace the <em><strong>labels </strong></em>values with the appropriate season:</p>
+<p></p>
+<h6 class="p">#### Part 8: Add seasons to the legend<br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_text(mapping=aes(x=avgTemp, y=relHum, color=1:nrow(weatherData),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; label=date),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size=2.5) +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_color_gradientn(colors=c("blue","brown","red","green","blue"),<br>&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <em class="hl">breaks=c(winterIndex, springIndex,</em><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">summerIndex, fallIndex),</em><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">labels=c("winter","spring",</em></h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">"summer","fall")) +</em></h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme(panel.grid.major = element_blank(), <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; panel.grid.minor = element_blank(),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; legend.key.height = unit(40, units="pt")) +&nbsp; # height of legend</h6>
+<h6 class="p">&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; labs(title = "Humidity vs. Temperature",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Degrees (Fahrenheit)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Relative Humidity",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color = "Dates");&nbsp;&nbsp;&nbsp; # title of legend<br>plot(thePlot);</h6>
+<p></p>
+<p>The tick marks are now at the first day of each season and labelled with the season's name.</p>
+<p></p>
+<p><img src="../Images/GGP-01-09-AddSeasons.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Adding seasons to the legend</h5>
+<h3>Changing gradient breaks</h3>
+<p>The gradient colors do not need to be place equidistant on the legend (in this case, at the 25<sup>th</sup>, 50<sup>th</sup>, and 75<sup>th</sup> percentiles), we can define the location of the gradient colors.</p>
+<p></p>
+<p>We used five <em><strong>colors</strong> </em>values in <em><strong>scale_color_gradientn()</strong></em>, so we need to define five percentile <em><strong>values</strong> </em>to place the color. The percentile <em><strong>values</strong> </em>are between <strong>0</strong> and <strong>1</strong>.</p>
+<h6 class="nn">colors=c("blue","brown","red","green","blue"),<br>values=c(0, 0.2, 0.55, 0.85, 1),</h6>
+<p></p>
+<p>In the above code, <strong>blue</strong> is put at both the top and bottom (<strong>0</strong>, <strong>1</strong>), <strong>brown</strong> is put at 20% (<strong>0.2</strong>), <strong>red</strong> at 55% (<strong>0.55</strong>), and <strong>green</strong> at 85% (<strong>0.85</strong>).</p>
+<p></p>
+<h6 class="p">#### Part 9: Change gradient breaks<br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_text(mapping=aes(x=avgTemp, y=relHum, color=1:nrow(weatherData),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; label=date),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size=2.5) +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_color_gradientn(colors=c("blue","brown","red","green","blue"),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">values=c(0, 0.2, 0.55, 0.85, 1)</em>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; breaks=c(winterIndex, springIndex,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; summerIndex, fallIndex),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labels=c("winter","spring","summer","fall")) +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme(panel.grid.major = element_blank(), <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; panel.grid.minor = element_blank(),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; legend.key.height = unit(25, units="pt")) +</h6>
+<h6 class="p">&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; labs(title = "Humidity vs. Temperature",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Degrees (Fahrenheit)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Relative Humidity",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color = "Dates");&nbsp; <br>plot(thePlot);</h6>
+<p></p>
+<p>The gradient colors in the legend have shifted to match the new <em><strong>color</strong> </em>placement.</p>
+<p></p>
+<p><img src="../Images/GGP-01-09-GradientShift.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Changing the position of the gradient colors</h5>
+<h2>Legend modifications</h2>
+<p>We will finish off the lesson by modifying the legend's:</p>
+<ul>
+<li>width</li>
+<li>height</li>
+<li>alignment</li>
+<li>position</li>
+</ul>
+<p></p>
+<p>All of this can be done in the <em><strong>theme()</strong></em> component.</p>
+<p></p>
+<h6 class="p">#### Part 10: Legend modifications<br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_text(mapping=aes(x=avgTemp, y=relHum, color=1:nrow(weatherData),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; label=date),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size=2.5) +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_color_gradientn(colors=c("blue","brown","red","green","blue"),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; values=c(0, 0.2, 0.55, 0.85, 1),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; breaks=c(winterIndex, springIndex,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; summerIndex, fallIndex),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labels=c("winter","spring","summer","fall")) +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme(panel.grid.major = element_blank(), <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; panel.grid.minor = element_blank(),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">legend.key.height = unit(15, units="pt"),</em>&nbsp; # height<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">legend.key.width = unit(40, units="pt"),</em>&nbsp;&nbsp; # width<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">legend.direction = "horizontal",</em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # alignment<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">legend.position = c(0.25, 0.08)) +</em> &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; # position<em class="hl"><br></em></h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Humidity vs. Temperature",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Degrees (Fahrenheit)",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Relative Humidity",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color = "");&nbsp; <br>plot(thePlot);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-09-LegendMods.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Changing the height, width, alignment, and position of the legend</h5>
+<h2>Application</h2>
+<ol>
+<li>Create a script file in your GGPlot Class Project called <em><strong>app09.r</strong></em>.&nbsp;</li>
+<li>Create a text plot of Precipitation vs Humidity</li>
+<li>Label the points with <em><strong>avgTemp</strong></em></li>
+<li><em></em>Color the text points using a gradient that goes from blue (coldest temp) to darkgreen (middle), to red (hottest)</li>
+<li>Change the y-axis to a logarithmic scale
+<ul>
+<li>This can be done by adding the component: <em><strong>scale_y_continuous(trans="log10")</strong></em></li>
+</ul>
+</li>
+<li>Move the legend into the plot area making sure not to cover any points.&nbsp; <br>
+<ul>
+<li>The legend's position will still change as the canvas is resized -- do not worry about this</li>
+</ul>
+</li>
+</ol>
+<h3>Questions</h3>
+<ol>
+<li>What was your level of comfort with the lesson/application?</li>
+<li>What areas of the lesson/application confused or still confuses you?</li>
+<li>What are some things you would like to learn related to, but not covered in, this lesson?</li>
+</ol>
+<h2 class="extension" id="pattern">Extension: the pattern parameter in grep()</h2>
+</body></html>

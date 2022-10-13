@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head>
+	<title></title>
+	<meta charset="UTF-8">
+	 <script type="text/javascript"> document.write('<'+'!--'); </script>
+       <link rel="stylesheet" type="text/css" href="/content/DEVELOPMENT/2018/courses/DEV-belinsky-2018-BackendTest/Programming/Release/editor.css">
+    <!-- -->
+	<script>
+const D2LMathML="";
+		var scriptFile = document.createElement('script');
+		scriptFile.src = "https://cdn.jsdelivr.net/gh/QFCatMSU/OnlineClassBackEnd/module.js";
+		document.getElementsByTagName('head')[0].appendChild(scriptFile);
+	</script>
+</head>
+
+<body>
+<p class="previousLesson">Boxplots 1</p>
+<p class="nextLesson">Barplots</p>
+<h1 class="title" id="title">01-07: Boxplots 2</h1>
+<h2>Purpose</h2>
+<ul>
+<li>Adding facets and groupings to a boxplot</li>
+<li>Styling individual boxes in a boxplot</li>
+<li>Changing titles and labels on a legend</li>
+</ul>
+<h2>Concepts</h2>
+<h2>Get data</h2>
+<p class="fs">For this lesson, we will work from the data file we created last lesson, <a href="https://cdn.jsdelivr.net/gh/QFCatMSU/GGPlot-Class-Material/data/LansingNOAA2016-3.csv" target="_self" class="download">LansingNOAA2016-3.csv</a>.</p>
+<h6>source( file="scripts/reference.R" ); <br>weatherData = read.csv( file="data/LansingNOAA2016-3.csv", <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stringsAsFactors = FALSE );</h6>
+<h2>Another way to group discrete variables</h2>
+<p>We are going to start with the same boxplot as the last lesson: <em><strong>changeMaxTemp</strong> </em>vs <em><strong>WindDir.&nbsp;</strong></em> In the last lesson we set the order of the wind direction levels using <em><strong>factor()</strong> </em>for the x-axis of the <em><strong>geom_boxplot()</strong></em>. This time we will set the order using the <em><strong>scale_x_discrete()</strong></em> component -- the subcomponent <em><strong>limits</strong> </em>is set to a vector that contains the order the categories will appear on the x-axis (<strong>North</strong>, <strong>East</strong>, <strong>South</strong>, <strong>West</strong>).</p>
+<p></p>
+<h6 class="p">#### Part 1: A different way to arrange x-axis values</h6>
+<h6 class="p">thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_boxplot(mapping=aes(x=windDir, y=changeMaxTemp),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; na.rm=TRUE) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">scale_x_discrete(limits=c("North", "East", "South", "West"))</em> +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Change in Temperature vs. Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Degrees (Fahrenheit)");<br>plot(thePlot);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-07-ScaleLimits.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="scale">Using <strong>scale_x_discrete</strong> to set the x-axis values</h5>
+<p></p>
+<p class="ref" id="r-quantiles">Extension: Changing quantiles</p>
+<h2>Grouping boxplots by levels</h2>
+<p>We can see in the previous boxplot (<em class="ref" id="r-scale">fig ##</em>) that northerly winds seem to coincide with lower temperatures and southerly winds seem to coincide with higher temperatures.&nbsp; This makes sense because, in Michigan, northerly winds tend to come from the Arctic and southerly winds come from the Gulf of Mexico.&nbsp;</p>
+<p></p>
+<p>Let's try to tease out more information by applying <em><strong>windSpeedLevel</strong> </em>to the plot.&nbsp; We are going to use <em><strong>windSpeedLevel</strong> </em>as a grouping variable so there will be three boxes representing different levels of wind (<strong>Low</strong>, <strong>Medium</strong>, <strong>High</strong>) for each of the four cardinal directions (<strong>N</strong>, <strong>E</strong>, <strong>S</strong>, <strong>W</strong>).</p>
+<p></p>
+<p>In the <em><strong>mapping</strong></em> for the boxplot, we use <em><strong>fill</strong> </em>to add <em><strong>windSpeedLevel</strong> </em>as a grouping variable.</p>
+<p></p>
+<p><em class="note">Note: GGPlot automatically generates a legend when the <strong>fill</strong> parameter is used.</em></p>
+<p><em class="note"></em></p>
+<h6 class="p">### Part 2: Group boxplots by wind speed levels</h6>
+<h6 class="p">thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_boxplot(mapping=aes(x=windDir, y=changeMaxTemp,</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">fill=windSpeedLevel</em>),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; na.rm=TRUE) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_x_discrete(limits=c("North", "East", "South", "West")) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Change in Temperature vs. Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Degrees (Fahrenheit)");<br>plot(thePlot);</h6>
+<p></p>
+<p>We now have 12 boxes, representing all combinations of three levels (Low, Medium, High) and four directions (North, East, South, West).&nbsp;</p>
+<p></p>
+<p><img src="../Images/GGP-01-07-Fill.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Grouping <strong>maxChangeTemp</strong> vs <strong>windDir</strong> by the strength of the wind (<strong>fill</strong>=<strong>windSpeedLevel</strong>)</h5>
+<h3>Reorder groups</h3>
+<h6 class="nn">fill = windSpeedLevel</h6>
+<p>...puts the <em><strong>windSpeedLevel</strong> </em>categories into the legend alphabetical order <strong>(High, Low, Medium)</strong>.&nbsp; But, we want the the levels to be in order of strength (<strong>Low</strong>, <strong>Medium</strong>, <strong>High</strong>).</p>
+<p></p>
+<p>We can use <em><strong>factor()</strong></em> to cast <em><strong>windSpeedLevel</strong> </em>into a factor vector with the <em><strong>levels</strong> </em>defined:</p>
+<h6 class="nn">factor(windSpeedLevel, levels=c("Low", "Medium", "High"))</h6>
+<p></p>
+<p>And use the factored <em><strong>windSpeedLevel</strong> </em>as the <em><strong>fill</strong> </em>in the <em><strong>mapping</strong> </em>for the <em><strong>geom_boxplot()</strong></em> component:</p>
+<h6 class="p">### Part 3: Re-order group as factors<br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_boxplot(mapping=aes(x=windDir, y=changeMaxTemp,</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em class="hl"> fill=factor(windSpeedLevel,</em><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">levels=c("Low", "Medium", "High")))</em>,</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; na.rm=TRUE) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_x_discrete(limits = c("North", "East", "South", "West")) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Change in Temperature vs. Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Degrees (Fahrenheit)");<br>plot(thePlot);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-07-FillLevels.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="reorder">Reordering the fill grouping.</h5>
+<h3>Changing the legend title</h3>
+<p>We now have the grouping in the right order but, by default, the title for the legend is the text value of the <em><strong>fill</strong> </em>in the <em><strong>mapping</strong></em>, which is a little awkward (<em class="ref" id="r-reorder">fig ##</em>).&nbsp; We can change the legend title use the <em><strong>fill</strong> </em>subcomponent in the<em><strong> labs(</strong><strong>)</strong></em> component.</p>
+<p></p>
+<h6 class="p">### Part 4: Changing the legend title<br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_boxplot(mapping=aes(x=windDir, y=changeMaxTemp,</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em class="hl"> fill=factor(windSpeedLevel,</em><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">levels=c("Low", "Medium", "High")))</em>,</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; na.rm=TRUE) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_x_discrete(limits = c("North", "East", "South", "West")) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Change in Temperature vs. Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Degrees (Fahrenheit)",</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">fill = "Wind Speeds"</em>);<br>plot(thePlot);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-07-LegendTitle.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Changing the legend title using <strong>labs()</strong></h5>
+<h3>Style and title changes to the legend and fill</h3>
+<p>We can change the fill colors using the <em><strong>scale_fill_manual()</strong></em> component.&nbsp; The parameter to set is <em><strong>values</strong> </em>and we need to supply a vector with three color values, representing the three levels (<strong>low</strong>, <strong>medium</strong>, <strong>high</strong>).&nbsp; Instead of color names, we will use red-green-blue colors, or RGB.</p>
+<p class="nn"></p>
+<h6 class="nn">scale_fill_manual(values = c(rgb(red=1, green=1, blue=0),&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # low</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; rgb(red=1, green=0.2, blue=0),&nbsp;&nbsp;&nbsp; # medium</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; rgb(red=0.5, green=0, blue=0.8))&nbsp; # high</h6>
+<p></p>
+<p>RGB (red-green-blue) colors have values from <strong>0</strong> (no light) to <strong>1</strong> (light completely on) so:</p>
+<ul>
+<li>
+<p class=""><em><strong>rgb(red=1, green=1, blue=0)</strong></em>: all red, all green, and no blue (yellow -- <em class="hl">remember these are light colors, not paint pigments</em>)</p>
+</li>
+<li>
+<p class=""><em><strong>rgb(red=1, green=0.2, blue=0)</strong></em>: all red, a little green, and no blue (red-orange)</p>
+</li>
+<li>
+<p class=""><em><strong>rgb(red=0.5, green=0, blue=0.8</strong><strong>)</strong></em>: some red, no green, and a lot of blue (purple)</p>
+</li>
+</ul>
+<p class="ref" id="l-rgb">Extension: More about RGB Colors</p>
+<p></p>
+<p>The code for the new plot is now:</p>
+<p></p>
+<h6 class="p">### Part 5: Adding color using rgb()<br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_boxplot(mapping=aes(x=windDir, y=changeMaxTemp,</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fill=factor(windSpeedLevel,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; levels=c("Low", "Medium", "High"))),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; na.rm=TRUE) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_x_discrete(limits = c("North", "East", "South", "West")) +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">scale_fill_manual(values = c(rgb(red=1, green=1, blue=0),</em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # low</h6>
+<h6 class="p"><em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </em><em class="hl">rgb(red=1, green=0.2, blue=0),</em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # medium</h6>
+<h6 class="p"><em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </em><em class="hl">rgb(red=0.5, green=0, blue=0.8)))</em> + # high<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Change in Temperature vs. Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Degrees (Fahrenheit)",</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fill = "Wind Speeds");&nbsp;&nbsp; # changes the legend (fill) title<br>plot(thePlot);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-07-FillColors.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Changing the legend title and the boxplot fill colors</h5>
+<h2>Using facets in a boxplot</h2>
+<p>We can also group the <em><strong>windSpeedLevel</strong> </em>category using facets. Where <em><strong>fill</strong> </em>grouped by a <em>variable </em><em class="hl">within the plot</em>, facets uses the grouping variable (in this case: <em><strong>windSpeedLevel</strong></em>) to <em class="hl">create multiple plots</em>.</p>
+<p></p>
+<p>The component is called <em><strong>facet_grid()</strong></em> and the subcomponent we are setting is <em><strong>facets</strong>.</em>&nbsp; The subcomponent facets requires both a y-axis and x-axis variable in the form <em>y-axis~x-axis.</em>&nbsp; Most of the time, you will only use facets along one axis, so you use a dot (<strong> .</strong> ) to represent an axis that has no facet.</p>
+<h6 class="nn">facet_grid(facets=windSpeedLevel ~ .)&nbsp; # facet in vertical direction</h6>
+<p><em><strong></strong></em></p>
+<p>In this example, <em><strong>windSpeedLevel</strong> </em>is set as the facet for the y-axis and the x-axis has no facet.</p>
+<h6 class="p">### Part 6: Using facets along the y-axis<br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_boxplot(mapping=aes(x=windDir, y=changeMaxTemp),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; na.rm=TRUE) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_x_discrete(limits = c("North", "East", "South", "West")) +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">facet_grid(facets=windSpeedLevel ~ .)</em> +&nbsp;# facet in vertical direction</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Change in Temperature vs. Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Degrees (Fahrenheit)");<br>plot(thePlot);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-07-VerticalFacet.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Adding facet in the vertical direction</h5>
+<h3>Adding a x-axis facet</h3>
+<p>In this example the plots would probably look better if <em><strong>windSpeedLevel</strong> </em>was arranged along the x-axis.&nbsp; To do this, we switch the axis order for the <em><strong>facets</strong> </em>parameter <strong>from:</strong></p>
+<h6 class="nn">(facets= windSpeedLevel ~ .)</h6>
+<p><strong>to: </strong></p>
+<h6 class="nn">(facets= . ~ windSpeedLevel)&nbsp;&nbsp;&nbsp; # facet in horizontal direction</h6>
+<p><em></em></p>
+<h6 class="p">### Part 7: Using facets along the x-axis<br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_boxplot(mapping=aes(x=windDir, y=changeMaxTemp),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; na.rm=TRUE) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_x_discrete(limits = c("North", "East", "South", "West")) +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; facet_grid(facets=<em class="hl">. ~ windSpeedLevel)</em> + # facet in horizontal direction</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Change in Temperature vs. Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Degrees (Fahrenheit)");<br>plot(thePlot);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-07-HorizontalFacet.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Adding a facet in the horizontal direction</h5>
+<p></p>
+<p class="note">Note: you can add both an horizontal and vertical facet to the plot -- the plot will get a bit busy if you do that, though.</p>
+<h2>Reordering the facet values</h2>
+<p>Once again, we have the issue that GGPlot orders categorical values alphabetically but we want <em><strong>windSpeedLevel</strong> </em>in order of strength.&nbsp; Just like with fill before, we can force <em><strong>windSpeedLevel</strong> </em>into a <em><strong>factor()</strong></em> and then set the order of the factor values.</p>
+<p></p>
+<h6 class="p">### Part 8: Ordering facets<br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_boxplot(mapping=aes(x=windDir, y=changeMaxTemp), na.rm=TRUE) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_x_discrete(limits = c("North", "East", "South", "West")) +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; facet_grid(facets= . ~ <em class="hl">factor(windSpeedLevel,</em><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">levels=c("Low", "Medium", "High")</em>)) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Change in Temperature vs. Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Degrees (Fahrenheit)");<br>plot(thePlot);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-07-ReorderFacets.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Reordering the facet values</h5>
+<h2>Adding color to the boxplots</h2>
+<p>We are going to modify the fill color and outline color of the boxplots.&nbsp; This is done using the <em><strong>color</strong></em> (outline color of box) and <em><strong>fill </strong></em>(fill color of box) subcomponents in <em><strong>geom_boxplot()</strong></em>.</p>
+<h3>One Color</h3>
+<p>If you want to set one color for all plots, you add <em><strong>color</strong> </em>and <em><strong>fill</strong> </em>subcomponents to the <em><strong>mapping()</strong></em> component:</p>
+<h6 class="p">### Part 9: Filling and coloring facets<br>thePlot = ggplot(data=weatherData) +</h6>
+<h6 class="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_boxplot(mapping=aes(x=windDir, y=changeMaxTemp),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; na.rm=TRUE,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">color="blue"</em>,&nbsp;&nbsp; # outline color</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">fill="red"</em>) +&nbsp;&nbsp; # fill color</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_x_discrete(limits = c("North", "East", "South", "West")) +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; facet_grid(facets= . ~ factor(windSpeedLevel,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; levels=c("Low", "Medium", "High"))) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Change in Temperature vs. Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Degrees (Fahrenheit)");<br>plot(thePlot);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-07-BoxColors.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Filling and outlining the boxplots with color</h5>
+<h3>All colors</h3>
+<p tabindex="0">If we want each of the plots to be different color then we need to set <em><strong>color</strong> </em>and <em><strong>fill</strong> </em>to a vector that contains the same number of values as there are plots (<strong>12</strong>).</p>
+<p tabindex="0"></p>
+<p>To set the <em><strong>color</strong> </em>value for all <strong>12</strong> plots, we need to use a vector with <strong>12</strong> color values like this:</p>
+<h6 class="nn">color = c("blue", "black", "black", "black",</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "green", "black", "black", "black",</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "orange", "black", "black", "black"),</h6>
+<p></p>
+<p>This will set the color of the first plot to <strong>blue</strong>, fifth plot to <strong>green</strong>, ninth plot to <strong>orange</strong>, and every other plot to black.&nbsp; However, we have repeating <strong>black</strong> values, so we can make use of <em><strong>rep()</strong></em> to avoid writing out the same value multiple times:</p>
+<p></p>
+<h6 class="nn">color = c("blue", rep("black", 3),&nbsp;&nbsp;&nbsp;&nbsp; # blue, black, black, black, blue...</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "green", rep("black", 3),&nbsp;&nbsp;&nbsp; # green, black, black, black, green...</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "orange", rep("black", 3)),&nbsp; # orange, black, black, black, orange...</h6>
+<p></p>
+<p>We can also set <em><strong>fill</strong> </em>to a vector with <strong>12</strong> color values.&nbsp; In this case, we will use <em><strong>NA</strong> </em>for plots that we do not want to have a fill color.</p>
+<h6 class="nn">fill = c(NA, NA, NA, NA, NA, NA, NA, NA, "red", "red", "red", NA)</h6>
+<p>or</p>
+<h6 class="nn">fill = c(rep(NA, 8), rep("red", 3), NA)&nbsp; # 8 NA, 3 red, 1 NA</h6>
+<p></p>
+<p>Putting the full code together:</p>
+<h6 class="p">### Part 10: Filling and coloring facets<br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_boxplot(mapping=aes(x=windDir, y=changeMaxTemp),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; na.rm=TRUE,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">color=c("blue", rep("black", 3), </em></h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">"green",</em> <em class="hl">rep("black", 3), </em></h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">"orange", rep("black", 3)),</em><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">fill=c(rep(NA, 8), rep("red", 3), NA))</em> +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_x_discrete(limits = c("North", "East", "South", "West")) +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; facet_grid(facets=.~factor(windSpeedLevel,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; levels=c("Low", "Medium", "High"))) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Change in Temperature vs. Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Degrees (Fahrenheit)");<br>plot(thePlot);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-07-MultipleColors.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>All fill and outline colors to the boxplots</h5>
+<h3>Wrong number of values</h3>
+<p>There are 12 boxplots in the plot area, <em class="hl">so we need to make sure that we have either 1 or 12 color values</em> -- otherwise, GGPlot will give the mismatch error: <em class="hl">Error: Aesthetics must be either length 1 or the same as the data (12)<br><br></em></p>
+<p tabindex="0"><img src="../Images/GGP-01-07-AestheticsError.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 tabindex="0">Putting the wrong number of values in the <strong>fill</strong> and <strong>color</strong> vectors</h5>
+<h2>Changing facet labels</h2>
+<p>Lastly, the labels on the facet are the values in the <em><strong>windSpeedLevel</strong> </em>column: <strong>Low</strong>, <strong>Medium</strong>, and <strong>High</strong>. Many times, we want to change the labels on the graph to be more descriptive.</p>
+<p></p>
+<p>Adding customized labels is a two-step process:</p>
+<ol>
+<li>Create a vector with the customized labels</li>
+<li>Use this vector for the <em><strong>labeller</strong> </em>subcomponent in the <em><strong>facet_grid()</strong></em> component</li>
+</ol>
+<h3>Components of facet labelling</h3>
+<p>We need to create a vector that maps the wind speed values (<strong>Low</strong>, <strong>Medium</strong>, <strong>High</strong>) with the label we want for each value:</p>
+<h6 class="nn">windLabels = c(Low = "Light Winds",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Medium = "Medium Winds",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; High = "Strong Winds");</h6>
+<p></p>
+<p>and then use the parameter <em><strong>labeller</strong> </em>in the component <em><strong>facet_grid()</strong></em> to add these labels to the legend.</p>
+<h6 class="nn">labeller=as_labeller(windLabels)</h6>
+<p></p>
+<p class="note">Note: the function <em><strong>as_labeller()</strong></em> explicitly says that the vector is a vector of labels</p>
+<h3>Putting the code together</h3>
+<h6 class="p">### Part 11: Changing facet labels</h6>
+<h6 class="p"><em class="hl">windLabels = c(Low = "Light Winds",</em><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">Medium = "Medium Winds",</em><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">High = "Strong Winds");</em></h6>
+<h6 class="p"><br>thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_boxplot(mapping=aes(x=windDir, y=changeMaxTemp),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; na.rm=TRUE,</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color=c("blue", rep("black", 3),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "green", rep("black", 3),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "orange", rep("black", 3)),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fill=c(rep(NA, 8), rep("red", 3), NA)) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_x_discrete(limits = c("North", "East", "South", "West")) +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; facet_grid(facets=.~factor(windSpeedLevel,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; levels=c("Low", "Medium", "High")),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">labeller=as_labeller(windLabels)</em>) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Change in Temperature vs. Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Degrees (Fahrenheit)");<br>plot(thePlot);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-07-Labels.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Changing labels on a facet</h5>
+<h2>Application</h2>
+<ol>
+<li>Create a script file in your GGPlot Class Project called <em><strong>app</strong><strong><em>07</em>.r</strong></em>.&nbsp;</li>
+<li>Create a vector that holds the quantile values for the 30<sup>th</sup> and 70<sup>th</sup> percentile of <em><strong>relHumidity</strong></em>.</li>
+<li>Using the quantile values, create a new column called <em><strong>humidityLevel </strong></em>that creates three levels for <em><strong>relHumidity</strong></em></li>
+<li>Create a boxplot of <em><strong>stnPressure</strong> </em>vs <em><strong>humidityLevel</strong></em>
+<ul>
+<li><em></em>Put <em><strong>humidityLevel</strong> </em>in order of increasing humidity</li>
+</ul>
+</li>
+<li>Add <em><strong>windDir</strong> </em>as a <em><strong>fill</strong> </em>to the boxplot</li>
+<li>Change order of <em><strong>windDir</strong> </em>to <strong>North</strong> - <strong>East</strong> - <strong>South</strong> - <strong>West</strong></li>
+<li>Add a horizontal facet (along the x-axis) using<strong></strong><em><strong> windSpeedLevel</strong></em></li>
+</ol>
+<p><em><strong></strong></em></p>
+<p>Here is approximately what I am looking for in the application:</p>
+<p><em><strong><img src="../Images/01-07%20App%20Image.png" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></strong></em></p>
+<h5>Humidity boxplot broken down using fill=winDir and facetting using windSpeedLevel</h5>
+<h3>Questions</h3>
+<ol>
+<li>What was your level of comfort with the lesson/application?</li>
+<li>What areas of the lesson/application confused or still confuses you?</li>
+<li>What are some things you would like to learn related to, but not covered in, this lesson?</li>
+</ol>
+<h2 class="extension" id="rgb">Extension: RGB Colors</h2>
+<p>RGB colors represent the three <em class="hl">primary light colors: </em>red, green, and blue.</p>
+<p></p>
+<p>Each color has a values from <strong>0</strong> to <strong>1, </strong>with <strong>0</strong> meaning the light is completely off, <strong>1 </strong>meaning the light is fully on, and values in between mean the light is partially on.</p>
+<p></p>
+<p>So:</p>
+<ul>
+<li><strong>rgb(red=1, green=0, blue=0)</strong> means the red light is fully on, green and blue are off</li>
+<li><strong>rgb(red=1, green=1, blue=1) </strong>is all three lights fully on (white)</li>
+<li><strong>rgb(red=0, green=0, blue=0) </strong>is all three lights off (black)</li>
+<li><strong>rgb(red=0.5, green=0.5, blue=0.5) </strong>is all three light half-on (grey)</li>
+</ul>
+<h2 class="extension" id="quantiles">Extension: Changing Quantiles</h2>
+<p>The percentiles GGPlot uses to calculate the quantiles in a boxplot are:</p>
+<p><strong>ymin</strong>: 5%</p>
+<p><strong>lower</strong>: 25%</p>
+<p><strong>middle</strong>: 50%</p>
+<p><strong>upper</strong>: 75%</p>
+<p><strong>ymax</strong>: 95%</p>
+<p></p>
+<p>GGPlot allows the user to set values for the quantiles -- this is shown in the <strong>Aesthetics</strong> section of the <a href="https://ggplot2.tidyverse.org/reference/geom_boxplot.html#aesthetics" target="_blank" rel="noopener">geom_boxplot() help page</a>.&nbsp; However, the parameters <strong>lower</strong>, <strong>upper</strong>, <strong>middle</strong>, <strong>ymin</strong>, <strong>ymax</strong> can only be used to set quantile values -- not percentiles.&nbsp; And, if you have multiple boxplots then the parameters need to be a vector with the same number of values as the number of boxplots.<br><br></p>
+<p>There is no easy way to do this.&nbsp; The way we will use is:</p>
+<ol>
+<li>Create a function that calculate quantile values and return a vector</li>
+<li>Call function and get the vector</li>
+<li>Apply vector to the quantile parameters</li>
+</ol>
+<h3><strong>Quantile function</strong></h3>
+<p>In the reference.r script file, we will add a new function called <em><strong>findQuants()</strong></em>.&nbsp;</p>
+<p></p>
+<p><em><strong>findQuants()</strong></em> will take four parameters:</p>
+<ul>
+<li>vector for the dependent variable</li>
+<li>vector for the independent variable</li>
+<li>a list of factors</li>
+<li>the percentile level</li>
+</ul>
+<p>&nbsp;</p>
+<p><em><strong>findQuants()</strong></em> will return a vector that gives the quantile value for each factor.&nbsp; So, the return vector will have the same number of values as the factor list.</p>
+<p></p>
+<h6 class="p">findQuants = function(yVar, xVar, factors, percentile)<br>{<br>&nbsp; quants = c();<br>&nbsp; for(i in factors)<br>&nbsp; {<br>&nbsp;&nbsp;&nbsp; quantIndex = which(xVar == i);<br>&nbsp;&nbsp;&nbsp; quants[i] = quantile(yVar[quantIndex], percentile, na.rm=TRUE);<br>&nbsp; }<br>&nbsp; return(quants)<br>}</h6>
+<h3>Calling findQuants()</h3>
+<p>For the following example, we are going to change the lower quantile to 35% and the upper quantile to 65% for all boxplots.</p>
+<p></p>
+<p>To do this we need to call<em><strong> findQuants()</strong> </em>twice: once for <em><strong>lower</strong> </em>and once for <em><strong>upper</strong></em>.&nbsp; The return values from <em><strong>findQuants() </strong></em>are saved to the vectors <em>lowVal </em>and <em><strong>highVal</strong></em>.</p>
+<p>&nbsp;</p>
+<h6 class="p">#### Extension: Setting quantile values<br>lowVal = findQuants(yVar = weatherData$changeMaxTemp,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; xVar = weatherData$windDir,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; factors = c("North", "East", "South", "West"),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; percentile = 0.35);</h6>
+<h6></h6>
+<h6>highVal = findQuants(yVar = weatherData$changeMaxTemp,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; xVar = weatherData$windDir,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; factors = c("North", "East", "South", "West"),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; percentile = 0.65);</h6>
+<p></p>
+<h3><em></em>Applying quant values to the plot</h3>
+<p>We are going to set the parameters <em><strong>lower</strong> </em>and <em><strong>upper</strong> </em>to the vector <em><strong>lowVal</strong> </em>and <em><strong>highVal</strong></em>.</p>
+<p></p>
+<h6 class="p">#### Extension: Applying quantile values</h6>
+<h6 class="p">thePlot = ggplot(data=weatherData) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_boxplot(mapping=aes(x=windDir, y=changeMaxTemp),</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; na.rm=TRUE,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">lower=lowVal, </em></h6>
+<h6 class="p"><em class="hl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; upper=highVal</em>) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scale_x_discrete(limits=c("North", "East", "South", "West")) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; theme_bw() +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; labs(title = "Change in Temperature vs. Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtitle = "Lansing, Michigan: 2016",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = "Wind Direction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = "Degrees (Fahrenheit)");<br>plot(thePlot);</h6>
+<p></p>
+<p>Executing the script creates boxplots with a smaller box that in the original (<em class="ref" id="r-scale">fig ##</em>):</p>
+<p></p>
+<p><img src="../Images/GGP-01-07-Quantiles.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Applying new quantile values to the boxplots</h5>
+<p></p>
+</body></html>

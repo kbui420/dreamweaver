@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head>
+	<title></title>
+	<meta charset="UTF-8">
+	<script type="text/javascript"> document.write('<'+'!--'); </script>
+       <link rel="stylesheet" type="text/css" href="/content/DEVELOPMENT/2018/courses/DEV-belinsky-2018-BackendTest/Programming/Release/editor.css">
+    <!-- -->
+	<script>
+const D2LMathML="";
+		var scriptFile = document.createElement('script');
+		scriptFile.src = "https://cdn.jsdelivr.net/gh/QFCatMSU/OnlineClassBackEnd/module.js";
+		document.getElementsByTagName('head')[0].appendChild(scriptFile);
+	</script>
+</head>
+
+<body>
+<p class="pl">RStudio Projects and GGPlot Setup</p>
+<p class="nl">Plot Styles</p>
+<h1 class="title" id="title">01-02: Components</h1>
+<h2>Purpose</h2>
+<ul>
+<li>Create a script file to be read from other scripts</li>
+<li>Create a scatterplot in GGPlot</li>
+<li>Modify the scatterplot using components</li>
+</ul>
+<h2>Open your project</h2>
+<div id="div3.1">
+<p>We are going to open the RStudio Project we created in the last lesson.&nbsp; You can open your project by any of the following three methods:</p>
+<ol>
+<li>Go to your Root Folder using your operating system's file manager and double-clicking the<em><strong> </strong><strong><em>.R</em>Proj</strong></em> file</li>
+<li>In RStudio: click <em><strong>File</strong> </em>-&gt;&nbsp; <em><strong>Recent Projects</strong></em> -&gt; (<em>choose your project</em>)</li>
+<li>In RStudio: click <em><strong>File</strong> </em>-&gt; <em><strong>Open Project</strong></em> -&gt; Navigate to the Root Folder and click the <em><strong>.RPro</strong><strong>j</strong></em> file</li>
+</ol>
+</div>
+<p></p>
+<h2>Reference Script</h2>
+<p>The first script we will create is a <em class="hl">reference script</em>, which is a script that is called by other scripts but is not executed on its own. The purpose of a reference script is to contain code used by multiple script files so that the code does not have to be repeated in each of those individual script file.&nbsp; <em class="note">Note: packages from libraries are also examples of reference scripts.</em></p>
+<p></p>
+<p>To create a new script in RStudio, click <em><strong>File</strong> </em>-&gt; <em><strong>New File</strong> </em>-&gt; <em><strong>R Script.</strong></em>&nbsp;</p>
+<p></p>
+<p>For now the reference script will contain three lines:</p>
+<h6>rm(list=ls());&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # clear Console Window</h6>
+<h6>options(show.error.locations = TRUE);&nbsp; # show line numbers on error</h6>
+<h6>library(package=ggplot2);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # include all GGPlot2 functions</h6>
+<p></p>
+<p>Copy the three lines to your new script file and save this script as<em><strong> reference.R</strong> </em>inside the <em><strong>scripts</strong> </em>folder in your Project (<em><strong>File</strong> </em>-&gt; <em><strong>Save as...</strong></em> -&gt; open <em><strong>scripts</strong> </em>folder -&gt; click <em><strong>Save</strong></em>) .</p>
+<p></p>
+<p><img src="../Images/GGP-01-02-ReferenceScript.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>The reference.r file inside the Script folder of the Project</h5>
+<p></p>
+<h3>Error locations</h3>
+<p>The second line of reference.r:</p>
+<h6 class="">options(show.error.locations = TRUE);&nbsp; # show line numbers on error</h6>
+<p>is a good line to always include in your R code because it helps you debug by giving you the line number that the compiler thinks an error is on.&nbsp; However, this error detection does not work within GGPlot code.&nbsp; So, it is of limited use in this class.</p>
+<h2>Looking at a data file</h2>
+<p>A plotting program is not very useful unless it has data.&nbsp; So, we first need to get some data and then set up a script to read in the data.</p>
+<h3>Get data for the plot</h3>
+<p>This <a href="https://vincentarelbundock.github.io/Rdatasets/datasets.html" target="_blank" rel="noopener noreferrer">website has hundreds of data set</a> that are freely available.&nbsp; We are going to use the data set called&nbsp;<a href="https://raw.githubusercontent.com/vincentarelbundock/Rdatasets/master/csv/Ecdat/CRANpackages.csv" target="_self">Growth of CRAN.</a>&nbsp; The data set gives the number of R Packages that were available each year from 2000 through 2014.</p>
+<p></p>
+<p>Save the CSV file, called <em><strong>CRANPackages.csv</strong></em> to the <em><strong>data</strong> </em>folder inside your Project.&nbsp; <em class="hl">It is best to use the operating system's File Explorer/Finder</em> to move the CSV file to the proper folder.&nbsp;&nbsp;&nbsp; <em class="ref" id="r-excel">Trap: Using Excel to move a CSV file</em></p>
+<p></p>
+<p><img src="../Images/GGP-01-02-PackageToDownload.PNG" alt="" class="fs"></p>
+<h5>The link to CRANPackage.csv&nbsp;</h5>
+<h3>Start a new script and include the files we need</h3>
+<p>We are going to start a new script called<em><strong> lesson02.R</strong></em> and use it to read in and plot the data from <em><strong>CRANPackage.csv</strong></em>.&nbsp;</p>
+<p></p>
+<p>To read in the data from <em><strong>CRANPackages.csv</strong></em>:</p>
+<ol>
+<li>Open a new script file (<em><strong>File</strong> </em>-&gt; <strong><em>New File</em></strong> -&gt; <em><strong>R Script</strong></em>).</li>
+<li>Add these two lines of code to the script:</li>
+</ol>
+<h6># execute the lines of code from reference.r</h6>
+<h6>source(file="scripts/reference.r");&nbsp;&nbsp;&nbsp; <br><br># read in CSV file and save the content to packageData<br>packageData = read.csv(file="data/CRANpackages.csv");</h6>
+<p></p>
+<p>Save the script file as <em><strong>lesson02.r</strong></em> inside the <em><strong>scripts</strong> </em>folder in your RStudio Project.</p>
+<h3>Look at the data</h3>
+<p>We execute <em><strong>lesson02.r</strong></em> by clicking <em><strong>Source </strong></em>(<em class="ref" id="r-dataFrame">fig ##</em>).&nbsp; <em class="ref" id="r-rvs">Extension: Run vs. Source</em></p>
+<p></p>
+<p>The script created the variable <em><strong>packageData</strong></em>, which you can see in the Environment Window (<em class="ref" id="r-dataFrame">fig ##</em>).&nbsp; <em><strong>packageData</strong> </em>is a data frame with <strong>5</strong> columns and <strong>29</strong> rows populated from <em><strong>CRANPackages.csv</strong></em>.</p>
+<p>&nbsp;</p>
+<p>A quick look at the five columns in <em><strong>packageData</strong> </em>(<em class="ref" id="r-dataFrame">fig ##</em>) shows that column <strong>4</strong> contains the number of <em><strong>Packages</strong> </em>in CRAN and column <strong>3</strong> contains the corresponding <em><strong>Date</strong></em>.</p>
+<p></p>
+<p><img src="../Images/GGP-01-02-PackageData.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="dataFrame">The data from the <em><strong class="">packageData</strong> </em>data frame</h5>
+<h2>Create plot data using GGPlot</h2>
+<p>Next, we will create a scatterplot of <em><strong>Packages</strong> (column 4) </em>vs <em><strong>Date</strong></em> (column 3) from <em><strong>packageData</strong></em>.</p>
+<p></p>
+<p>The code to create a scatterplot using GGPlot is:</p>
+<h6># read in the lines of code from reference.r</h6>
+<h6>source(file="scripts/reference.r");&nbsp;&nbsp;&nbsp; <br><br># read in CSV file and save the content to packageData<br>packageData = read.csv(file="data/CRANpackages.csv");<br><br><em class="hl">plotData = ggplot( data=packageData ) + </em></h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">geom_point( mapping=aes(x=Date, y=Packages) ); </em><br><em class="hl">plot(plotData);</em></h6>
+<p></p>
+<p>Let's <em><strong>Source</strong> </em>the script -- the code will be explained in a bit and the overlapping x-axis date labels will be fixed.</p>
+<p></p>
+<p><img src="../Images/GGP-01-02-ParameterNames.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="plot1">Our first plot using GGPlot with parameter names highlighted</h5>
+<p></p>
+<p class="ref" id="r-warning">Extension: The yellow warning sign</p>
+<h3>Taking out parameter names</h3>
+<p>In <em class="ref" id="r-plot1">fig ##</em> I highlighted the parameter names in the code (which, in GGPlot, are also the subcomponents).&nbsp; In this case, the script will still work even if we take out all the parameter names:</p>
+<h6># same five lines of code without parameter names in the functions</h6>
+<h6>source("scripts/reference.r");&nbsp;&nbsp;&nbsp; <br>packageData = read.csv("data/CRANpackages.csv");<br><br>plotData = ggplot( packageData ) +</h6>
+<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point( aes(Date, Packages) ); <br>plot(plotData);</h6>
+<p></p>
+<p><img src="../Images/GGP-01-02-NoParams.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="scatterplot">Same script as above with the parameter names taken out</h5>
+<h3>Benefits of using parameter names</h3>
+<p>This script works because we only used the default parameters for each function and we used the parameters in the same order as they appear in the function.</p>
+<p></p>
+<p>In this class, <em class="hl">we will (almost always) use parameter names</em> because using parameter names:</p>
+<ul>
+<li>makes the code more intuitive to the reader -- and making code more intuitive should (almost always) take precedence over saving space.</li>
+<li>means that you can order the parameters however you want</li>
+<li>avoids bad assumptions about the ordering of parameters and their default values</li>
+</ul>
+<p></p>
+<p>The one exception where we will not use parameter names is:</p>
+<h6 class="p">plot(plotData)&nbsp;&nbsp; # no parameter name here</h6>
+<p>instead of</p>
+<h6 class="p">plot(x=plotData) # x is the parameter name</h6>
+<p></p>
+<p>There are multiple functions in R and GGPlot where the parameter name <em><strong>x</strong></em> is used generically as the name for the first parameter in a function.&nbsp; This is not intuitive because <em><strong>x</strong></em> is also used to refer to data that goes on the x-axis.&nbsp;</p>
+<p></p>
+<p>We will use the parameter name <em><strong>x</strong></em> only when <em><strong>x</strong></em> refers to an axis (line 10 in <em class="ref" id="r-plot1">fig ##</em>: <em><strong>x=Date</strong></em>) but not when <em><strong>x</strong></em> is a generic first-parameter name (line 11 in<em> <em class="ref" id="r-plot1">fig ##</em></em><em class="ref" id="r-plot1"></em>: <em><strong>x=plotData</strong></em>).</p>
+<h2>Components of a GGPlot</h2>
+<p>Let's take a more detailed look at the three lines of code that created the scatterplot in <em class="ref" id="l-scatterplot">figure ##</em>...</p>
+<p></p>
+<p>First we initialize the canvas for the plotting area using <em><strong>ggplot()</strong></em> and the data frame we are going to use, <em><strong>packageData</strong></em>:</p>
+<h6 class="p">plotData = <em class="hl">ggplot( data=packageData ) </em>+</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point( mapping=aes(x=Date, y=Packages) );&nbsp; <br>plot(plotData);</h6>
+<p></p>
+<p>Next, we add the component, <em><strong>geom_point()</strong></em>, which creates a scatterplot using the <em><strong>Date</strong> </em>and <em><strong>Packages</strong> </em>columns from <em><strong>packageData</strong></em>:</p>
+<h6 class="p">plotData = ggplot( data=packageData ) +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">geom_point( mapping=aes(x=Date, y=Packages) )</em>;&nbsp; <br>plot(plotData);</h6>
+<p></p>
+<p>The ggplot information is saved to a <strong>List</strong> variable named <em><strong>plotData:</strong></em></p>
+<h6 class="p"><em class="hl">plotData</em> = ggplot( data=packageData ) +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point( mapping=aes(x=Date, y=Packages) );&nbsp; <br>plot(plotData);</h6>
+<p></p>
+<p>And then <em><strong>plot()</strong></em> is used to display the canvas saved in <em><strong>plotData</strong></em>:</p>
+<h6 class="p">plotData = ggplot(data=packageData ) +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point( mapping=aes(x=Date, y=Packages) ); <br><em class="hl">plot(plotData);</em></h6>
+<p></p>
+<h3>GGPlot components</h3>
+<p>In GGPlot, you initialize a canvas and then add components (often called layers) to the canvas.&nbsp; The <em><strong>+</strong></em> symbol is used to add components.&nbsp; In the above example (<em class="ref" id="r-plot1">fig ##</em>), there is the initializing canvas function and one component:</p>
+<p></p>
+<p>1) <em><strong>ggplot()</strong></em> is used to initialize a GGPlot canvas with the data from the data frame:<em><strong></strong></em></p>
+<h6 class="p">plotData = <em class="hl">ggplot( data=packageData )</em> +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point( mapping=aes(x=Date, y=Packages) );</h6>
+<p></p>
+<p>2) <em><strong>geom_point()</strong></em> is a plotting component that creates a scatterplot <em><strong></strong></em></p>
+<h6 class="p">plotData = ggplot( data=packageData ) +<em class="hl"> </em></h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">geom_point( mapping=aes(x=Date, y=Packages) )</em>;</h6>
+<h3>GGPlot mapping and aesthetics (aes)</h3>
+<p><em class="hl">All plotting components in GGPlot contain a subcomponent called <strong>mapping</strong></em>.&nbsp; <em><strong>mapping</strong> </em>is used to describe the relationship between the data and the plot.&nbsp; Or, another way to put it, <em><strong>mapping</strong> </em>describes what data gets represented on the plot (e.g., <em><strong>Date</strong> </em>and <em><strong>Packages</strong></em>) and how the data gets represented (e.g., <em><strong>Date</strong> </em>on x-axis, <em><strong>Packages</strong> </em>on y-axis):&nbsp; <em class="hl"><br></em></p>
+<p></p>
+<h6 class="p">plotData = ggplot( data=packageData ) +</h6>
+<h6 class="p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geom_point( mapping=<em class="hl">aes(x=Date, y=Packages)</em> );</h6>
+<p></p>
+<p>The <em><strong>mapping</strong> </em>is set to a <em class="hl">mapping element</em> called an aesthetic (<em><strong>aes</strong></em>).&nbsp; The concept of an aesthetic comes into play when we are generating legends and creating data categories, which we will talk about in future lessons.&nbsp; In the meantime, it is probably easier to just think of <em><strong>aes</strong> </em>as a mapping element.</p>
+<h2>Adding more components to the canvas</h2>
+<p>Let's say we want to make the three following modifications to the plot:</p>
+<ol>
+<li>add a title</li>
+<li>change the numeric tick marks on the y-axis</li>
+<li>change the direction of the x-axis labels (so we can read the labels)</li>
+</ol>
+<p></p>
+<p>To do this we will add <em class="hl">three new components</em> to the canvas:</p>
+<ol>
+<li><em><strong>ggtitle()&nbsp;</strong></em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; # title component</li>
+<li><em><strong>scale_Y_continuous()</strong></em>&nbsp;&nbsp;&nbsp; # y-scaling component (there is a corresponding x-scaling component)</li>
+<li><em><strong>theme()&nbsp;</strong></em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; # theme component</li>
+</ol>
+<p></p>
+<p>We add components using (<em><strong> +</strong> </em>). <em class="note"></em></p>
+<h6>source(file="scripts/reference.r");&nbsp;&nbsp;&nbsp; <br>packageData = read.csv(file="data/CRANpackages.csv");<br><br></h6>
+<h6>plotData = ggplot( data=packageData ) +<em class="hl"> </em></h6>
+<h6><em class="">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</em>&nbsp; geom_point( mapping=aes(x=Date, y=Packages) ) +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">ggtitle( label="Packages in CRAN (2001-2014)" ) +</em><br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<em class="hl">scale_y_continuous( breaks = seq(from=0, to=6000, by=500) ) +</em><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em class="hl">theme( axis.text.x=element_text(angle=90, hjust=1) );</em></h6>
+<h6>plot(plotData);</h6>
+<p></p>
+<p><em class="ref" id="r-plus">Trap: putting the ( + ) on the next line</em></p>
+<p></p>
+<p><img src="../Images/GGP-01-02-Components.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Scatterplot with a few added components</h5>
+<h3>The Components in detail</h3>
+<h6 class="nn">ggtitle( label="Packages in CRAN (2001-2014)" )<em class="hl"></em></h6>
+<p></p>
+<p>When we search in the <em><strong>Help</strong> </em>tab for <em><strong>ggtitle()</strong></em> (<em class="ref" id="r-help">fig ##</em>) we see that it has two subcomponents (or parameters) to change:</p>
+<ul>
+<li><em><strong>label</strong></em>: the title</li>
+<li><em><strong>subtitle </strong></em>(not used in this example): a secondary title that has no value, or <strong>NULL</strong><em>,</em> as a default</li>
+</ul>
+<p>&nbsp;</p>
+<p><img src="../Images/GGP-01-02-HelpTab.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="help">Using the Help Tab in RStudio to find info about GGPlot components</h5>
+<p></p>
+<h6 class="nn">scale_y_continuous( breaks = seq(from=0, to=6000, by=500) )&nbsp;</h6>
+<p></p>
+<p><em><strong>scale_y_continuous()</strong></em> is the component used when you want to modify a y-axis that has continuous values.&nbsp; There are many subcomponents (<em class="ref" id="r-scale_y">fig ##</em>) that can be changed in <em><strong>scale_y_continuous()</strong></em>.&nbsp; We modified one subcomponent, <em><strong>breaks</strong>, </em>by setting it to a sequence from <strong>0</strong> to <strong>6000</strong> and the tick marks were placed at intervals of <strong>500</strong>.&nbsp; <em class="note">Note:<strong> waiver()</strong>, which is used as a default value for many of the subcomponents, is a somewhat unintuituve way of saying to use the values calculated by the plotting function (i.e. default values).</em></p>
+<p></p>
+<p><img src="../Images/GGP-01-02-ScaleYCont.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="scale_y">Scale_y_continuous help page</h5>
+<p></p>
+<h6 class="nn">theme( axis.text.x=element_text(angle=90, hjust=1) )</h6>
+<p></p>
+<p>In this example we changed one subcomponent in <em><strong>theme()</strong></em> called <em><strong>axis.text.x</strong></em> and set it to a <em><strong>element_text()</strong></em> that modifies the text by rotating it to an <em><strong>angle</strong></em> of <strong>90</strong> degrees and right-justifying the text (<em><strong>hjust</strong></em>=<strong>1</strong>).&nbsp; <em class="note">Note: <strong>hjust=0</strong> left-justifies the text, <strong>hjust=0.5</strong> centers the text.</em></p>
+<p></p>
+<p><em><strong>theme()</strong> </em>is probably the most used component in GGPlot and we could spend a whole class going through all the subcomponents of <em><strong>theme()</strong></em>.&nbsp; Broadly speaking, <em><strong>theme()</strong></em> is used to make modifications to the canvas (the plots and the background) that are not data related.&nbsp; We will be using <em><strong>theme()</strong> </em>a lot more in future lessons and talking more about elements (e.g., <em><strong>element_text()</strong></em>).</p>
+<p></p>
+<p><img src="../Images/GGP-01-02-Theme.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5><strong>theme()</strong> component help page (yes, there is a lot there!)</h5>
+<h3>For more help with components</h3>
+<p>A good place to find more information about components in GGPlot is the <strong>Help</strong> tab in the lower-right corner of RStudio.&nbsp; The <em><strong>Help</strong> </em>tab provides information directly from <a href="https://ggplot2.tidyverse.org/reference/">https://ggplot2.tidyverse.org/reference/</a>, which is the official webpage for GGPlot. &nbsp;</p>
+<h2>Application</h2>
+<p><em><strong>Create a scatterplot:</strong></em></p>
+<ol>
+<li>Download the&nbsp;<a href="https://raw.github.com/vincentarelbundock/Rdatasets/master/csv/MASS/accdeaths.csv" target="_blank" rel="noopener noreferrer" class="download">Accidental Deaths in the US 1973-1978</a> data file and save to your project's <em><strong>data</strong> </em>folder</li>
+<li>Create a new R script file in your project's <em><strong>script</strong> </em>folder called <em><strong>app02.R</strong></em></li>
+<li>Include the reference file, <strong>reference.r</strong>, in <em><strong>app02.R</strong></em></li>
+<li>Do a scatterplot of <em><strong>accdeaths</strong></em> vs <em><strong>time</strong> </em>using the data from the downloaded data file</li>
+<li>Add a title to the plot</li>
+<li>Change the angle of the x-axis labels to 45 degrees</li>
+<li>Change the <em><strong>x-axis</strong></em> ticks to go by half-year instead of whole year (i.e., <strong>1973</strong>, <strong>1973.5</strong>, <strong>1974, 1974.5</strong>...)
+<ul>
+<li>Note: you can treat the years as numbers</li>
+</ul>
+</li>
+<li>Have the<strong> y</strong><em><strong>-axis</strong></em> only display three values: <strong>7000</strong>, <strong>9000</strong>, and&nbsp; <strong>11000</strong></li>
+<li>Zip your Root Folder with <em><strong>app02.r</strong></em> and the downloaded data file</li>
+<li><em class="email">Email the zipped Root Folder to the instructor</em></li>
+</ol>
+<p></p>
+<p><strong>Windows: Zip your Root Folder</strong> (<em id="r-root" class="ref">fig ##</em>)<strong>:</strong></p>
+<ol>
+<li>In your File Manager (not in RStudio), right-click on the Root Folder</li>
+<li>Choose <em><strong>Send to</strong></em></li>
+<li>Choose <em><strong>Compressed (zipped) folder</strong></em></li>
+<li>A zipped file named <em><strong>&lt;Root Folder&gt;.zip</strong></em> with all your Root Folder contents is created in the same folder</li>
+</ol>
+<p></p>
+<p><img src="../Images/GGP-01-01-ZipFolder.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"><strong><em> <br></em></strong></p>
+<h5 class="" id="root">Zipping your Root Folder</h5>
+<p></p>
+<p><strong>Mac: Zip your Root Folder:</strong></p>
+<ol>
+<li>In your File Manager (not in RStudio), right-click on the Root Folder</li>
+<li>Choose <em><strong>Compress "&lt;Root Folder&gt;"</strong></em></li>
+<li>A zipped file named <em><strong>&lt;Root Folder&gt;.zip</strong></em> with all your Root Folder contents is created in the same folder</li>
+</ol>
+<h3>Questions</h3>
+<ol>
+<li>What was your level of comfort with the lesson/application?</li>
+<li>What areas of the lesson/application confused or still confuses you?</li>
+<li>What are some things you would like to learn related to, but not covered in, this lesson?</li>
+</ol>
+<p><!-- [if gte mso 9]><xml>
+ <o:OfficeDocumentSettings>
+  <o:AllowPNG/>
+ </o:OfficeDocumentSettings>
+</xml><![endif]--><!-- [if gte mso 9]><xml>
+ <w:WordDocument>
+  <w:View>Normal</w:View>
+  <w:Zoom>0</w:Zoom>
+  <w:TrackMoves/>
+  <w:TrackFormatting/>
+  <w:PunctuationKerning/>
+  <w:ValidateAgainstSchemas/>
+  <w:SaveIfXMLInvalid>false</w:SaveIfXMLInvalid>
+  <w:IgnoreMixedContent>false</w:IgnoreMixedContent>
+  <w:AlwaysShowPlaceholderText>false</w:AlwaysShowPlaceholderText>
+  <w:DoNotPromoteQF/>
+  <w:LidThemeOther>EN-US</w:LidThemeOther>
+  <w:LidThemeAsian>X-NONE</w:LidThemeAsian>
+  <w:LidThemeComplexScript>X-NONE</w:LidThemeComplexScript>
+  <w:Compatibility>
+   <w:BreakWrappedTables/>
+   <w:SnapToGridInCell/>
+   <w:WrapTextWithPunct/>
+   <w:UseAsianBreakRules/>
+   <w:DontGrowAutofit/>
+   <w:SplitPgBreakAndParaMark/>
+   <w:EnableOpenTypeKerning/>
+   <w:DontFlipMirrorIndents/>
+   <w:OverrideTableStyleHps/>
+  </w:Compatibility>
+  <m:mathPr>
+   <m:mathFont m:val="Cambria Math"/>
+   <m:brkBin m:val="before"/>
+   <m:brkBinSub m:val="&#45;-"/>
+   <m:smallFrac m:val="off"/>
+   <m:dispDef/>
+   <m:lMargin m:val="0"/>
+   <m:rMargin m:val="0"/>
+   <m:defJc m:val="centerGroup"/>
+   <m:wrapIndent m:val="1440"/>
+   <m:intLim m:val="subSup"/>
+   <m:naryLim m:val="undOvr"/>
+  </m:mathPr></w:WordDocument>
+</xml><![endif]--><!-- [if gte mso 9]><xml>
+ <w:LatentStyles DefLockedState="false" DefUnhideWhenUsed="false"
+  DefSemiHidden="false" DefQFormat="false" DefPriority="99"
+  LatentStyleCount="376">
+  <w:LsdException Locked="false" Priority="0" QFormat="true" Name="Normal"/>
+  <w:LsdException Locked="false" Priority="9" QFormat="true" Name="heading 1"/>
+  <w:LsdException Locked="false" Priority="9" SemiHidden="true"
+   UnhideWhenUsed="true" QFormat="true" Name="heading 2"/>
+  <w:LsdException Locked="false" Priority="9" SemiHidden="true"
+   UnhideWhenUsed="true" QFormat="true" Name="heading 3"/>
+  <w:LsdException Locked="false" Priority="9" SemiHidden="true"
+   UnhideWhenUsed="true" QFormat="true" Name="heading 4"/>
+  <w:LsdException Locked="false" Priority="9" SemiHidden="true"
+   UnhideWhenUsed="true" QFormat="true" Name="heading 5"/>
+  <w:LsdException Locked="false" Priority="9" SemiHidden="true"
+   UnhideWhenUsed="true" QFormat="true" Name="heading 6"/>
+  <w:LsdException Locked="false" Priority="9" SemiHidden="true"
+   UnhideWhenUsed="true" QFormat="true" Name="heading 7"/>
+  <w:LsdException Locked="false" Priority="9" SemiHidden="true"
+   UnhideWhenUsed="true" QFormat="true" Name="heading 8"/>
+  <w:LsdException Locked="false" Priority="9" SemiHidden="true"
+   UnhideWhenUsed="true" QFormat="true" Name="heading 9"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="index 1"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="index 2"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="index 3"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="index 4"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="index 5"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="index 6"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="index 7"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="index 8"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="index 9"/>
+  <w:LsdException Locked="false" Priority="39" SemiHidden="true"
+   UnhideWhenUsed="true" Name="toc 1"/>
+  <w:LsdException Locked="false" Priority="39" SemiHidden="true"
+   UnhideWhenUsed="true" Name="toc 2"/>
+  <w:LsdException Locked="false" Priority="39" SemiHidden="true"
+   UnhideWhenUsed="true" Name="toc 3"/>
+  <w:LsdException Locked="false" Priority="39" SemiHidden="true"
+   UnhideWhenUsed="true" Name="toc 4"/>
+  <w:LsdException Locked="false" Priority="39" SemiHidden="true"
+   UnhideWhenUsed="true" Name="toc 5"/>
+  <w:LsdException Locked="false" Priority="39" SemiHidden="true"
+   UnhideWhenUsed="true" Name="toc 6"/>
+  <w:LsdException Locked="false" Priority="39" SemiHidden="true"
+   UnhideWhenUsed="true" Name="toc 7"/>
+  <w:LsdException Locked="false" Priority="39" SemiHidden="true"
+   UnhideWhenUsed="true" Name="toc 8"/>
+  <w:LsdException Locked="false" Priority="39" SemiHidden="true"
+   UnhideWhenUsed="true" Name="toc 9"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Normal Indent"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="footnote text"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="annotation text"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="header"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="footer"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="index heading"/>
+  <w:LsdException Locked="false" Priority="35" SemiHidden="true"
+   UnhideWhenUsed="true" QFormat="true" Name="caption"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="table of figures"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="envelope address"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="envelope return"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="footnote reference"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="annotation reference"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="line number"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="page number"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="endnote reference"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="endnote text"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="table of authorities"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="macro"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="toa heading"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="List"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="List Bullet"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="List Number"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="List 2"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="List 3"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="List 4"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="List 5"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="List Bullet 2"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="List Bullet 3"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="List Bullet 4"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="List Bullet 5"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="List Number 2"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="List Number 3"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="List Number 4"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="List Number 5"/>
+  <w:LsdException Locked="false" Priority="10" QFormat="true" Name="Title"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Closing"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Signature"/>
+  <w:LsdException Locked="false" Priority="1" SemiHidden="true"
+   UnhideWhenUsed="true" Name="Default Paragraph Font"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Body Text"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Body Text Indent"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="List Continue"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="List Continue 2"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="List Continue 3"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="List Continue 4"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="List Continue 5"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Message Header"/>
+  <w:LsdException Locked="false" Priority="11" QFormat="true" Name="Subtitle"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Salutation"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Date"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Body Text First Indent"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Body Text First Indent 2"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Note Heading"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Body Text 2"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Body Text 3"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Body Text Indent 2"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Body Text Indent 3"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Block Text"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Hyperlink"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="FollowedHyperlink"/>
+  <w:LsdException Locked="false" Priority="22" QFormat="true" Name="Strong"/>
+  <w:LsdException Locked="false" Priority="20" QFormat="true" Name="Emphasis"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Document Map"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Plain Text"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="E-mail Signature"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="HTML Top of Form"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="HTML Bottom of Form"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Normal (Web)"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="HTML Acronym"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="HTML Address"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="HTML Cite"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="HTML Code"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="HTML Definition"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="HTML Keyboard"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="HTML Preformatted"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="HTML Sample"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="HTML Typewriter"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="HTML Variable"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Normal Table"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="annotation subject"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="No List"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Outline List 1"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Outline List 2"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Outline List 3"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Simple 1"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Simple 2"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Simple 3"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Classic 1"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Classic 2"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Classic 3"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Classic 4"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Colorful 1"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Colorful 2"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Colorful 3"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Columns 1"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Columns 2"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Columns 3"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Columns 4"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Columns 5"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Grid 1"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Grid 2"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Grid 3"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Grid 4"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Grid 5"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Grid 6"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Grid 7"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Grid 8"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table List 1"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table List 2"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table List 3"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table List 4"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table List 5"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table List 6"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table List 7"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table List 8"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table 3D effects 1"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table 3D effects 2"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table 3D effects 3"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Contemporary"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Elegant"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Professional"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Subtle 1"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Subtle 2"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Web 1"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Web 2"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Web 3"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Balloon Text"/>
+  <w:LsdException Locked="false" Priority="39" Name="Table Grid"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Table Theme"/>
+  <w:LsdException Locked="false" SemiHidden="true" Name="Placeholder Text"/>
+  <w:LsdException Locked="false" Priority="1" QFormat="true" Name="No Spacing"/>
+  <w:LsdException Locked="false" Priority="60" Name="Light Shading"/>
+  <w:LsdException Locked="false" Priority="61" Name="Light List"/>
+  <w:LsdException Locked="false" Priority="62" Name="Light Grid"/>
+  <w:LsdException Locked="false" Priority="63" Name="Medium Shading 1"/>
+  <w:LsdException Locked="false" Priority="64" Name="Medium Shading 2"/>
+  <w:LsdException Locked="false" Priority="65" Name="Medium List 1"/>
+  <w:LsdException Locked="false" Priority="66" Name="Medium List 2"/>
+  <w:LsdException Locked="false" Priority="67" Name="Medium Grid 1"/>
+  <w:LsdException Locked="false" Priority="68" Name="Medium Grid 2"/>
+  <w:LsdException Locked="false" Priority="69" Name="Medium Grid 3"/>
+  <w:LsdException Locked="false" Priority="70" Name="Dark List"/>
+  <w:LsdException Locked="false" Priority="71" Name="Colorful Shading"/>
+  <w:LsdException Locked="false" Priority="72" Name="Colorful List"/>
+  <w:LsdException Locked="false" Priority="73" Name="Colorful Grid"/>
+  <w:LsdException Locked="false" Priority="60" Name="Light Shading Accent 1"/>
+  <w:LsdException Locked="false" Priority="61" Name="Light List Accent 1"/>
+  <w:LsdException Locked="false" Priority="62" Name="Light Grid Accent 1"/>
+  <w:LsdException Locked="false" Priority="63" Name="Medium Shading 1 Accent 1"/>
+  <w:LsdException Locked="false" Priority="64" Name="Medium Shading 2 Accent 1"/>
+  <w:LsdException Locked="false" Priority="65" Name="Medium List 1 Accent 1"/>
+  <w:LsdException Locked="false" SemiHidden="true" Name="Revision"/>
+  <w:LsdException Locked="false" Priority="34" QFormat="true"
+   Name="List Paragraph"/>
+  <w:LsdException Locked="false" Priority="29" QFormat="true" Name="Quote"/>
+  <w:LsdException Locked="false" Priority="30" QFormat="true"
+   Name="Intense Quote"/>
+  <w:LsdException Locked="false" Priority="66" Name="Medium List 2 Accent 1"/>
+  <w:LsdException Locked="false" Priority="67" Name="Medium Grid 1 Accent 1"/>
+  <w:LsdException Locked="false" Priority="68" Name="Medium Grid 2 Accent 1"/>
+  <w:LsdException Locked="false" Priority="69" Name="Medium Grid 3 Accent 1"/>
+  <w:LsdException Locked="false" Priority="70" Name="Dark List Accent 1"/>
+  <w:LsdException Locked="false" Priority="71" Name="Colorful Shading Accent 1"/>
+  <w:LsdException Locked="false" Priority="72" Name="Colorful List Accent 1"/>
+  <w:LsdException Locked="false" Priority="73" Name="Colorful Grid Accent 1"/>
+  <w:LsdException Locked="false" Priority="60" Name="Light Shading Accent 2"/>
+  <w:LsdException Locked="false" Priority="61" Name="Light List Accent 2"/>
+  <w:LsdException Locked="false" Priority="62" Name="Light Grid Accent 2"/>
+  <w:LsdException Locked="false" Priority="63" Name="Medium Shading 1 Accent 2"/>
+  <w:LsdException Locked="false" Priority="64" Name="Medium Shading 2 Accent 2"/>
+  <w:LsdException Locked="false" Priority="65" Name="Medium List 1 Accent 2"/>
+  <w:LsdException Locked="false" Priority="66" Name="Medium List 2 Accent 2"/>
+  <w:LsdException Locked="false" Priority="67" Name="Medium Grid 1 Accent 2"/>
+  <w:LsdException Locked="false" Priority="68" Name="Medium Grid 2 Accent 2"/>
+  <w:LsdException Locked="false" Priority="69" Name="Medium Grid 3 Accent 2"/>
+  <w:LsdException Locked="false" Priority="70" Name="Dark List Accent 2"/>
+  <w:LsdException Locked="false" Priority="71" Name="Colorful Shading Accent 2"/>
+  <w:LsdException Locked="false" Priority="72" Name="Colorful List Accent 2"/>
+  <w:LsdException Locked="false" Priority="73" Name="Colorful Grid Accent 2"/>
+  <w:LsdException Locked="false" Priority="60" Name="Light Shading Accent 3"/>
+  <w:LsdException Locked="false" Priority="61" Name="Light List Accent 3"/>
+  <w:LsdException Locked="false" Priority="62" Name="Light Grid Accent 3"/>
+  <w:LsdException Locked="false" Priority="63" Name="Medium Shading 1 Accent 3"/>
+  <w:LsdException Locked="false" Priority="64" Name="Medium Shading 2 Accent 3"/>
+  <w:LsdException Locked="false" Priority="65" Name="Medium List 1 Accent 3"/>
+  <w:LsdException Locked="false" Priority="66" Name="Medium List 2 Accent 3"/>
+  <w:LsdException Locked="false" Priority="67" Name="Medium Grid 1 Accent 3"/>
+  <w:LsdException Locked="false" Priority="68" Name="Medium Grid 2 Accent 3"/>
+  <w:LsdException Locked="false" Priority="69" Name="Medium Grid 3 Accent 3"/>
+  <w:LsdException Locked="false" Priority="70" Name="Dark List Accent 3"/>
+  <w:LsdException Locked="false" Priority="71" Name="Colorful Shading Accent 3"/>
+  <w:LsdException Locked="false" Priority="72" Name="Colorful List Accent 3"/>
+  <w:LsdException Locked="false" Priority="73" Name="Colorful Grid Accent 3"/>
+  <w:LsdException Locked="false" Priority="60" Name="Light Shading Accent 4"/>
+  <w:LsdException Locked="false" Priority="61" Name="Light List Accent 4"/>
+  <w:LsdException Locked="false" Priority="62" Name="Light Grid Accent 4"/>
+  <w:LsdException Locked="false" Priority="63" Name="Medium Shading 1 Accent 4"/>
+  <w:LsdException Locked="false" Priority="64" Name="Medium Shading 2 Accent 4"/>
+  <w:LsdException Locked="false" Priority="65" Name="Medium List 1 Accent 4"/>
+  <w:LsdException Locked="false" Priority="66" Name="Medium List 2 Accent 4"/>
+  <w:LsdException Locked="false" Priority="67" Name="Medium Grid 1 Accent 4"/>
+  <w:LsdException Locked="false" Priority="68" Name="Medium Grid 2 Accent 4"/>
+  <w:LsdException Locked="false" Priority="69" Name="Medium Grid 3 Accent 4"/>
+  <w:LsdException Locked="false" Priority="70" Name="Dark List Accent 4"/>
+  <w:LsdException Locked="false" Priority="71" Name="Colorful Shading Accent 4"/>
+  <w:LsdException Locked="false" Priority="72" Name="Colorful List Accent 4"/>
+  <w:LsdException Locked="false" Priority="73" Name="Colorful Grid Accent 4"/>
+  <w:LsdException Locked="false" Priority="60" Name="Light Shading Accent 5"/>
+  <w:LsdException Locked="false" Priority="61" Name="Light List Accent 5"/>
+  <w:LsdException Locked="false" Priority="62" Name="Light Grid Accent 5"/>
+  <w:LsdException Locked="false" Priority="63" Name="Medium Shading 1 Accent 5"/>
+  <w:LsdException Locked="false" Priority="64" Name="Medium Shading 2 Accent 5"/>
+  <w:LsdException Locked="false" Priority="65" Name="Medium List 1 Accent 5"/>
+  <w:LsdException Locked="false" Priority="66" Name="Medium List 2 Accent 5"/>
+  <w:LsdException Locked="false" Priority="67" Name="Medium Grid 1 Accent 5"/>
+  <w:LsdException Locked="false" Priority="68" Name="Medium Grid 2 Accent 5"/>
+  <w:LsdException Locked="false" Priority="69" Name="Medium Grid 3 Accent 5"/>
+  <w:LsdException Locked="false" Priority="70" Name="Dark List Accent 5"/>
+  <w:LsdException Locked="false" Priority="71" Name="Colorful Shading Accent 5"/>
+  <w:LsdException Locked="false" Priority="72" Name="Colorful List Accent 5"/>
+  <w:LsdException Locked="false" Priority="73" Name="Colorful Grid Accent 5"/>
+  <w:LsdException Locked="false" Priority="60" Name="Light Shading Accent 6"/>
+  <w:LsdException Locked="false" Priority="61" Name="Light List Accent 6"/>
+  <w:LsdException Locked="false" Priority="62" Name="Light Grid Accent 6"/>
+  <w:LsdException Locked="false" Priority="63" Name="Medium Shading 1 Accent 6"/>
+  <w:LsdException Locked="false" Priority="64" Name="Medium Shading 2 Accent 6"/>
+  <w:LsdException Locked="false" Priority="65" Name="Medium List 1 Accent 6"/>
+  <w:LsdException Locked="false" Priority="66" Name="Medium List 2 Accent 6"/>
+  <w:LsdException Locked="false" Priority="67" Name="Medium Grid 1 Accent 6"/>
+  <w:LsdException Locked="false" Priority="68" Name="Medium Grid 2 Accent 6"/>
+  <w:LsdException Locked="false" Priority="69" Name="Medium Grid 3 Accent 6"/>
+  <w:LsdException Locked="false" Priority="70" Name="Dark List Accent 6"/>
+  <w:LsdException Locked="false" Priority="71" Name="Colorful Shading Accent 6"/>
+  <w:LsdException Locked="false" Priority="72" Name="Colorful List Accent 6"/>
+  <w:LsdException Locked="false" Priority="73" Name="Colorful Grid Accent 6"/>
+  <w:LsdException Locked="false" Priority="19" QFormat="true"
+   Name="Subtle Emphasis"/>
+  <w:LsdException Locked="false" Priority="21" QFormat="true"
+   Name="Intense Emphasis"/>
+  <w:LsdException Locked="false" Priority="31" QFormat="true"
+   Name="Subtle Reference"/>
+  <w:LsdException Locked="false" Priority="32" QFormat="true"
+   Name="Intense Reference"/>
+  <w:LsdException Locked="false" Priority="33" QFormat="true" Name="Book Title"/>
+  <w:LsdException Locked="false" Priority="37" SemiHidden="true"
+   UnhideWhenUsed="true" Name="Bibliography"/>
+  <w:LsdException Locked="false" Priority="39" SemiHidden="true"
+   UnhideWhenUsed="true" QFormat="true" Name="TOC Heading"/>
+  <w:LsdException Locked="false" Priority="41" Name="Plain Table 1"/>
+  <w:LsdException Locked="false" Priority="42" Name="Plain Table 2"/>
+  <w:LsdException Locked="false" Priority="43" Name="Plain Table 3"/>
+  <w:LsdException Locked="false" Priority="44" Name="Plain Table 4"/>
+  <w:LsdException Locked="false" Priority="45" Name="Plain Table 5"/>
+  <w:LsdException Locked="false" Priority="40" Name="Grid Table Light"/>
+  <w:LsdException Locked="false" Priority="46" Name="Grid Table 1 Light"/>
+  <w:LsdException Locked="false" Priority="47" Name="Grid Table 2"/>
+  <w:LsdException Locked="false" Priority="48" Name="Grid Table 3"/>
+  <w:LsdException Locked="false" Priority="49" Name="Grid Table 4"/>
+  <w:LsdException Locked="false" Priority="50" Name="Grid Table 5 Dark"/>
+  <w:LsdException Locked="false" Priority="51" Name="Grid Table 6 Colorful"/>
+  <w:LsdException Locked="false" Priority="52" Name="Grid Table 7 Colorful"/>
+  <w:LsdException Locked="false" Priority="46"
+   Name="Grid Table 1 Light Accent 1"/>
+  <w:LsdException Locked="false" Priority="47" Name="Grid Table 2 Accent 1"/>
+  <w:LsdException Locked="false" Priority="48" Name="Grid Table 3 Accent 1"/>
+  <w:LsdException Locked="false" Priority="49" Name="Grid Table 4 Accent 1"/>
+  <w:LsdException Locked="false" Priority="50" Name="Grid Table 5 Dark Accent 1"/>
+  <w:LsdException Locked="false" Priority="51"
+   Name="Grid Table 6 Colorful Accent 1"/>
+  <w:LsdException Locked="false" Priority="52"
+   Name="Grid Table 7 Colorful Accent 1"/>
+  <w:LsdException Locked="false" Priority="46"
+   Name="Grid Table 1 Light Accent 2"/>
+  <w:LsdException Locked="false" Priority="47" Name="Grid Table 2 Accent 2"/>
+  <w:LsdException Locked="false" Priority="48" Name="Grid Table 3 Accent 2"/>
+  <w:LsdException Locked="false" Priority="49" Name="Grid Table 4 Accent 2"/>
+  <w:LsdException Locked="false" Priority="50" Name="Grid Table 5 Dark Accent 2"/>
+  <w:LsdException Locked="false" Priority="51"
+   Name="Grid Table 6 Colorful Accent 2"/>
+  <w:LsdException Locked="false" Priority="52"
+   Name="Grid Table 7 Colorful Accent 2"/>
+  <w:LsdException Locked="false" Priority="46"
+   Name="Grid Table 1 Light Accent 3"/>
+  <w:LsdException Locked="false" Priority="47" Name="Grid Table 2 Accent 3"/>
+  <w:LsdException Locked="false" Priority="48" Name="Grid Table 3 Accent 3"/>
+  <w:LsdException Locked="false" Priority="49" Name="Grid Table 4 Accent 3"/>
+  <w:LsdException Locked="false" Priority="50" Name="Grid Table 5 Dark Accent 3"/>
+  <w:LsdException Locked="false" Priority="51"
+   Name="Grid Table 6 Colorful Accent 3"/>
+  <w:LsdException Locked="false" Priority="52"
+   Name="Grid Table 7 Colorful Accent 3"/>
+  <w:LsdException Locked="false" Priority="46"
+   Name="Grid Table 1 Light Accent 4"/>
+  <w:LsdException Locked="false" Priority="47" Name="Grid Table 2 Accent 4"/>
+  <w:LsdException Locked="false" Priority="48" Name="Grid Table 3 Accent 4"/>
+  <w:LsdException Locked="false" Priority="49" Name="Grid Table 4 Accent 4"/>
+  <w:LsdException Locked="false" Priority="50" Name="Grid Table 5 Dark Accent 4"/>
+  <w:LsdException Locked="false" Priority="51"
+   Name="Grid Table 6 Colorful Accent 4"/>
+  <w:LsdException Locked="false" Priority="52"
+   Name="Grid Table 7 Colorful Accent 4"/>
+  <w:LsdException Locked="false" Priority="46"
+   Name="Grid Table 1 Light Accent 5"/>
+  <w:LsdException Locked="false" Priority="47" Name="Grid Table 2 Accent 5"/>
+  <w:LsdException Locked="false" Priority="48" Name="Grid Table 3 Accent 5"/>
+  <w:LsdException Locked="false" Priority="49" Name="Grid Table 4 Accent 5"/>
+  <w:LsdException Locked="false" Priority="50" Name="Grid Table 5 Dark Accent 5"/>
+  <w:LsdException Locked="false" Priority="51"
+   Name="Grid Table 6 Colorful Accent 5"/>
+  <w:LsdException Locked="false" Priority="52"
+   Name="Grid Table 7 Colorful Accent 5"/>
+  <w:LsdException Locked="false" Priority="46"
+   Name="Grid Table 1 Light Accent 6"/>
+  <w:LsdException Locked="false" Priority="47" Name="Grid Table 2 Accent 6"/>
+  <w:LsdException Locked="false" Priority="48" Name="Grid Table 3 Accent 6"/>
+  <w:LsdException Locked="false" Priority="49" Name="Grid Table 4 Accent 6"/>
+  <w:LsdException Locked="false" Priority="50" Name="Grid Table 5 Dark Accent 6"/>
+  <w:LsdException Locked="false" Priority="51"
+   Name="Grid Table 6 Colorful Accent 6"/>
+  <w:LsdException Locked="false" Priority="52"
+   Name="Grid Table 7 Colorful Accent 6"/>
+  <w:LsdException Locked="false" Priority="46" Name="List Table 1 Light"/>
+  <w:LsdException Locked="false" Priority="47" Name="List Table 2"/>
+  <w:LsdException Locked="false" Priority="48" Name="List Table 3"/>
+  <w:LsdException Locked="false" Priority="49" Name="List Table 4"/>
+  <w:LsdException Locked="false" Priority="50" Name="List Table 5 Dark"/>
+  <w:LsdException Locked="false" Priority="51" Name="List Table 6 Colorful"/>
+  <w:LsdException Locked="false" Priority="52" Name="List Table 7 Colorful"/>
+  <w:LsdException Locked="false" Priority="46"
+   Name="List Table 1 Light Accent 1"/>
+  <w:LsdException Locked="false" Priority="47" Name="List Table 2 Accent 1"/>
+  <w:LsdException Locked="false" Priority="48" Name="List Table 3 Accent 1"/>
+  <w:LsdException Locked="false" Priority="49" Name="List Table 4 Accent 1"/>
+  <w:LsdException Locked="false" Priority="50" Name="List Table 5 Dark Accent 1"/>
+  <w:LsdException Locked="false" Priority="51"
+   Name="List Table 6 Colorful Accent 1"/>
+  <w:LsdException Locked="false" Priority="52"
+   Name="List Table 7 Colorful Accent 1"/>
+  <w:LsdException Locked="false" Priority="46"
+   Name="List Table 1 Light Accent 2"/>
+  <w:LsdException Locked="false" Priority="47" Name="List Table 2 Accent 2"/>
+  <w:LsdException Locked="false" Priority="48" Name="List Table 3 Accent 2"/>
+  <w:LsdException Locked="false" Priority="49" Name="List Table 4 Accent 2"/>
+  <w:LsdException Locked="false" Priority="50" Name="List Table 5 Dark Accent 2"/>
+  <w:LsdException Locked="false" Priority="51"
+   Name="List Table 6 Colorful Accent 2"/>
+  <w:LsdException Locked="false" Priority="52"
+   Name="List Table 7 Colorful Accent 2"/>
+  <w:LsdException Locked="false" Priority="46"
+   Name="List Table 1 Light Accent 3"/>
+  <w:LsdException Locked="false" Priority="47" Name="List Table 2 Accent 3"/>
+  <w:LsdException Locked="false" Priority="48" Name="List Table 3 Accent 3"/>
+  <w:LsdException Locked="false" Priority="49" Name="List Table 4 Accent 3"/>
+  <w:LsdException Locked="false" Priority="50" Name="List Table 5 Dark Accent 3"/>
+  <w:LsdException Locked="false" Priority="51"
+   Name="List Table 6 Colorful Accent 3"/>
+  <w:LsdException Locked="false" Priority="52"
+   Name="List Table 7 Colorful Accent 3"/>
+  <w:LsdException Locked="false" Priority="46"
+   Name="List Table 1 Light Accent 4"/>
+  <w:LsdException Locked="false" Priority="47" Name="List Table 2 Accent 4"/>
+  <w:LsdException Locked="false" Priority="48" Name="List Table 3 Accent 4"/>
+  <w:LsdException Locked="false" Priority="49" Name="List Table 4 Accent 4"/>
+  <w:LsdException Locked="false" Priority="50" Name="List Table 5 Dark Accent 4"/>
+  <w:LsdException Locked="false" Priority="51"
+   Name="List Table 6 Colorful Accent 4"/>
+  <w:LsdException Locked="false" Priority="52"
+   Name="List Table 7 Colorful Accent 4"/>
+  <w:LsdException Locked="false" Priority="46"
+   Name="List Table 1 Light Accent 5"/>
+  <w:LsdException Locked="false" Priority="47" Name="List Table 2 Accent 5"/>
+  <w:LsdException Locked="false" Priority="48" Name="List Table 3 Accent 5"/>
+  <w:LsdException Locked="false" Priority="49" Name="List Table 4 Accent 5"/>
+  <w:LsdException Locked="false" Priority="50" Name="List Table 5 Dark Accent 5"/>
+  <w:LsdException Locked="false" Priority="51"
+   Name="List Table 6 Colorful Accent 5"/>
+  <w:LsdException Locked="false" Priority="52"
+   Name="List Table 7 Colorful Accent 5"/>
+  <w:LsdException Locked="false" Priority="46"
+   Name="List Table 1 Light Accent 6"/>
+  <w:LsdException Locked="false" Priority="47" Name="List Table 2 Accent 6"/>
+  <w:LsdException Locked="false" Priority="48" Name="List Table 3 Accent 6"/>
+  <w:LsdException Locked="false" Priority="49" Name="List Table 4 Accent 6"/>
+  <w:LsdException Locked="false" Priority="50" Name="List Table 5 Dark Accent 6"/>
+  <w:LsdException Locked="false" Priority="51"
+   Name="List Table 6 Colorful Accent 6"/>
+  <w:LsdException Locked="false" Priority="52"
+   Name="List Table 7 Colorful Accent 6"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Mention"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Smart Hyperlink"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Hashtag"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Unresolved Mention"/>
+  <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true"
+   Name="Smart Link"/>
+ </w:LatentStyles>
+</xml><![endif]--><!-- [if gte mso 10]>
+<style>
+ /* Style Definitions */
+ table.MsoNormalTable
+	{mso-style-name:"Table Normal";
+	mso-tstyle-rowband-size:0;
+	mso-tstyle-colband-size:0;
+	mso-style-noshow:yes;
+	mso-style-priority:99;
+	mso-style-parent:"";
+	mso-padding-alt:0in 5.4pt 0in 5.4pt;
+	mso-para-margin:0in;
+	mso-para-margin-bottom:.0001pt;
+	line-height:107%;
+	mso-pagination:widow-orphan;
+	font-size:11.0pt;
+	font-family:"Calibri",sans-serif;
+	mso-ascii-font-family:Calibri;
+	mso-ascii-theme-font:minor-latin;
+	mso-hansi-font-family:Calibri;
+	mso-hansi-theme-font:minor-latin;
+	mso-bidi-font-family:"Times New Roman";
+	mso-bidi-theme-font:minor-bidi;}
+</style>
+<![endif]--></p>
+<h2 class="extension" id="projectWindow">Extension: RStudio Project windows</h2>
+<p>An RStudio Project takes the whole RStudio window -- also called an <em class="hl">RStudio Session</em>.&nbsp; If you want to open up a second RStudio Project, you need to start a new RStudio Session (i.e., a new window).&nbsp; This can be dome by clicking<em><strong> File -&gt; Open Project in New Session.&nbsp; </strong></em></p>
+<p></p>
+<p>RStudio considers only files saved within the Root Folder (and subfolders) of the Project to be a part of the Project.&nbsp; You can create a script file that is independent of the RStudio Project you are working on, you just need to save the script file outside of the Project's Root Folder.&nbsp;</p>
+<h2 class="trap" id="excel">Trap: Using Excel to move files</h2>
+<p>On many computers, Microsoft Excel is the default application for opening CSV files -- so double-clicking on a CSV file opens it in Excel.&nbsp; So, it is common for people to open a CSV file in Excel and then save it to a different folder.&nbsp; There are a couple of issues with using Excel to move CSV files:</p>
+<p></p>
+<ol>
+<li>Some versions of Excel will ask you to save the file with an XLSX extension -- make sure you ignore that.&nbsp; This will convert the file from a CSV to an XLSX, and the file will be unreadable in R.</li>
+<li>Excel will occasionally change the format of a column.&nbsp; For instance, if you have a column with values that look like this: <em><strong>01-01, 01-02, 01-03</strong></em> then Excel will likely switch those values to dates like this: <em><strong>Jan-1, Jan-2, Jan-3</strong> </em><em><strong></strong></em></li>
+</ol>
+<p><em><strong></strong></em></p>
+<p>You should not use Excel to move a CSV.&nbsp; Instead, use the system's File Explorer (Windows) / Finder (Mac) to move the file.&nbsp; You can also safely open the CSV file in RStudio and save it to another location.</p>
+<h2 class="extension" id="rvs">Extension: Run vs. Source</h2>
+<p>Technically speaking, the difference between <em><strong>Run</strong> </em>and <em><strong>Source</strong> </em>is:</p>
+<ul>
+<li><em><strong>Source</strong> </em>will execute all the code in a script file.</li>
+<li><em><strong>Run</strong> </em>will execute only the line that the cursor is on or all lines that are highlighted.</li>
+</ul>
+<p></p>
+<p>The real difference lies in a historical discussion of scripting vs. programming, which is a discussion beyond this class.&nbsp; Suffice to say,&nbsp; R was originally intended to be a quick-and-dirty scripting language where users could immediately pull in data and produce a plot or perform statistical analysis.&nbsp; Using this method, an R-user would produce and execute one line of code at a time using the equivalent of the <em><strong>Run</strong> </em>button.</p>
+<p></p>
+<p>As R has grown, the focus has shifted into developing well-structured code that can be easily shared, tweaked, and reused -- similar to a modern programming language like C.&nbsp; Using this method, an R-user would produce a full script and execute it all using the equivalent of the <em><strong>Source</strong> </em>button.&nbsp; This is the method we will be using in this class.</p>
+<h2 class="trap" id="plus">Trap: Putting the ( + ) on the next line</h2>
+<p>The ( <strong>+</strong> ) commands strings together the components of a GGPlot.&nbsp; A common mistake is to put the ( + ) at the beginning of the following line:</p>
+<p></p>
+<h6>source(file="scripts/reference.R"); <br>packageData = read.csv(file="data/CRANpackages.csv");<br><br>plotData = ggplot( data=packageData ) <br>&nbsp; &nbsp; + geom_point( mapping=aes(x=Date, y=Packages) ) <br>&nbsp; &nbsp; + ggtitle(label="Packages in CRAN (2001-2014)") <br>&nbsp; &nbsp; + scale_y_continuous(breaks = seq(from=0, to=6000, by=500)) <br>&nbsp;&nbsp;&nbsp; + theme(axis.text.x=element_text(angle=90, hjust=1));<br>plot(plotData);</h6>
+<p></p>
+<p>This will result in an error and a surprisingly wise assessment of the problem fro the R debugger.<em class="hl"></em></p>
+<p></p>
+<p><img src="../Images/GGP-01-02-NewLineError.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5>Error when putting the ( + ) on the next line</h5>
+<p></p>
+<p>The reason for this error is that R thinks that line 5:</p>
+<h6 class="nn">plotData = ggplot( data=packageData )</h6>
+<p>is a fully-formed and completed command&nbsp;</p>
+<p></p>
+<p>And R does not understand why line 6 starts a new command with a ( <strong>+</strong> )</p>
+<h6 class="nn">&nbsp; + geom_point( mapping=aes(x=Date, y=Packages) )</h6>
+<p></p>
+<p>A ( <strong>+</strong> ) at the end of a line tells R to append the next line to the current line.&nbsp; A ( <strong>+</strong> ) at the beginning of a line tells R to perform the mathematical operation addition.</p>
+<h2 class="extension" id="warning">Extension: The yellow warning sign</h2>
+<p>When you are working in GGPlot and have debugging features turned on in RStudio, you will almost always see multiple yellow warning signs on the side of your code (<em class="ref" id="r-scope">fig ##</em>).&nbsp; The warning<em class="hl"> no symbol named 'Date' in scope</em> means that RStudio does not recognize <em><strong>Date</strong></em> as a variable or a function. This is because <em><strong>Date</strong> </em>is a variable within the GGPlot function <em><strong>geom_point()</strong></em>, and the debugger is not sophisticated enough to always search through the GGPlot functions.</p>
+<p></p>
+<p>Unfortunately, this is just a limitation of the RStudio debugger.</p>
+<p></p>
+<p><img src="../Images/GGP-01-02-Warning.PNG" alt="" style="max-width: 100%;" data-d2l-editor-default-img-style="true" class="fs"></p>
+<h5 class="" id="scope">Warning about variables within the GGPlot functions</h5>
+<p>
+<script type="text/javascript">document.oncontextmenu=null;document.onselectstart=null;document.ondragstart=null;document.onmousedown=null;document.body.oncontextmenu=null;document.body.onselectstart=null;document.body.ondragstart=null;document.body.onmousedown=null;document.body.oncut=null;document.body.oncopy=null;document.body.onpaste=null;</script>
+</p>
+</body></html>
